@@ -40,6 +40,15 @@ public class IndexActivity extends AppCompatActivity
         mViewLoading = findViewById( R.id.index_activity_layoutMain );
         mViewLoading.setVisibility( View.VISIBLE );
         mStartQuizButton = ( Button ) findViewById( R.id.index_activity_new_quizButton );
+        mStartQuizButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /* Todo
+                Using all the information gotten, start an activity hosting a gridView populated fragment
+                and display all the available subjects.
+                 */
+            }
+        });
         LoadStartupConfigFile();
 
         mHandlerThread = new ChislevHandlerThread( this, new Handler() );
