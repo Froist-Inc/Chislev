@@ -12,8 +12,85 @@
     tools:context="com.froist_inc.josh.completeprogrammingquiz.IndexActivity"
     tools:showIn="@layout/activity_index">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:id="@+id/relativeLayout">
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/index_activity_bannerView">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    android:text="@string/index_activity_loading"
+                    />
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    android:text="@string/index_activity_scores"/>
+            </LinearLayout>
+        </HorizontalScrollView>
+    </RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_below="@+id/relativeLayout"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+        <Button
+            android:id="@+id/index_activity_new_quizButton"
+            android:background="@drawable/custom_button_oval_shape"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="@string/index_activity_new_quiz"
+            android:padding="25dp"
+            />
+        <Button
+            android:id="@+id/index_activity_scoreButton"
+            android:text="@string/index_activity_scores"
+            android:background="@drawable/custom_button_oval_shape"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:padding="25dp" />
+        <Button
+            android:id="@+id/index_activity_contributeButton"
+            android:text="@string/index_activity_contribute"
+            android:background="@drawable/custom_button_oval_shape"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:padding="25dp"
+            />
+    </LinearLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:gravity="center"
+        android:id="@+id/index_activity_layoutMain">
+        <TextView
+            android:id="@+id/index_activity_loadingTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="15dp"
+            android:text="@string/index_activity_loading"
+            android:textStyle="bold"
+            />
+        <ProgressBar
+            android:layout_below="@id/index_activity_loadingTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            style="@android:style/Widget.ProgressBar.Large" />
+    </RelativeLayout>
 </RelativeLayout>

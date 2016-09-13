@@ -1,0 +1,64 @@
+package com.froist_inc.josh.completeprogrammingquiz;
+
+/**
+ * Created by Josh on 12-Sep-16.
+ */
+public class ChislevSubjectInformation
+{
+    private String mSubjectName;
+    private String mSubjectCode;
+    private String mSubjectDataUrl;
+    private String mSubjectAnswerUrl;
+    private String mSubjectFilename;
+    private String mSubjectUpdateFilename;
+
+    private boolean mIsAllSet = false;
+    /**
+     *
+     * @param name name given to the subject, e.g. C++, Java, Analogy
+     * @param code name of the root directory containing the necessary information regarding
+     *             the subject. e.g. for C++, code could be cpp.
+     * @param dataUrl name of the URL containing the resource for `name`
+     * @param filename local filename to save the resource file of the subject
+     * @param updateFilename during an update, the `filename` resource file might change, this signifies
+     *                       the new resource file to use in replacement of `filename`
+     */
+    public ChislevSubjectInformation( String name, String code, String dataUrl, String answerUrl,
+                                      String filename, String updateFilename )
+    {
+        mSubjectName = name;
+        mSubjectCode = code;
+        mSubjectDataUrl = dataUrl;
+        mSubjectAnswerUrl = answerUrl;
+        mSubjectFilename = filename;
+        mSubjectUpdateFilename = updateFilename;
+    }
+
+    public String getSubjectName() {
+        return mSubjectName;
+    }
+
+    public String getSubjectCode() {
+        return mSubjectCode;
+    }
+
+    public String getSubjectDataUrl() {
+        return mSubjectDataUrl;
+    }
+
+    public String getSubjectFilename() {
+        return mSubjectFilename;
+    }
+
+    public String getSubjectAnswerUrl() {
+        return mSubjectAnswerUrl;
+    }
+    public void setIsAllSet( boolean isSet )
+    {
+        mIsAllSet = isSet;
+    }
+    public boolean isAllSet()
+    {
+        return mIsAllSet;
+    }
+}
