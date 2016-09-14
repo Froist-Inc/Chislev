@@ -48,12 +48,17 @@ public class ChislevXMLSerializer
                 String subjectName = xmlPullParser.getAttributeValue( null, "name" ),
                         subjectCode = xmlPullParser.getAttributeValue( null, "code" ),
                         subjectUrl = xmlPullParser.getAttributeValue( null, "location" ),
-                        subjectAnswerUrl = xmlPullParser.getAttributeValue( null, "answer" ),
                         subjectFilename = xmlPullParser.getAttributeValue( null, "filename" ),
-                        subjectUpdatedFilename = xmlPullParser.getAttributeValue( null, "new_filename" );
-                informationList.add( new ChislevSubjectInformation( subjectName, subjectCode, subjectUrl,
-                        subjectAnswerUrl, subjectFilename, subjectUpdatedFilename ) );
+                        subjectUpdatedFilename = xmlPullParser.getAttributeValue( null, "new_filename" ),
+                        subjectAnswerUrl = xmlPullParser.getAttributeValue( null, "answer" ),
+                        subjectIconUrl = xmlPullParser.getAttributeValue( null, "icon" );
+                ChislevSubjectInformation subjectInformation = new ChislevSubjectInformation( subjectName,
+                        subjectCode, subjectUrl, subjectAnswerUrl, subjectFilename, subjectUpdatedFilename );
+                subjectInformation.setSubjectIconUrl( subjectIconUrl );
+
+                informationList.add( subjectInformation );
             }
+            xmlEvent = xmlPullParser.next();
         }
     }
 }

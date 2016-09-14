@@ -5,12 +5,13 @@ package com.froist_inc.josh.completeprogrammingquiz;
  */
 public class ChislevSubjectInformation
 {
-    private String mSubjectName;
-    private String mSubjectCode;
-    private String mSubjectDataUrl;
-    private String mSubjectAnswerUrl;
-    private String mSubjectFilename;
-    private String mSubjectUpdateFilename;
+    private String mSubjectName = null;
+    private String mSubjectCode = null;
+    private String mSubjectDataUrl = null;
+    private String mSubjectAnswerUrl = null;
+    private String mSubjectFilename = null;
+    private String mSubjectUpdateFilename = null;
+    private String mSubjectIconUrl = null;
 
     private boolean mIsAllSet = false;
     /**
@@ -19,6 +20,7 @@ public class ChislevSubjectInformation
      * @param code name of the root directory containing the necessary information regarding
      *             the subject. e.g. for C++, code could be cpp.
      * @param dataUrl name of the URL containing the resource for `name`
+     * @param answerUrl url leading to the answer's database online
      * @param filename local filename to save the resource file of the subject
      * @param updateFilename during an update, the `filename` resource file might change, this signifies
      *                       the new resource file to use in replacement of `filename`
@@ -53,7 +55,17 @@ public class ChislevSubjectInformation
     public String getSubjectAnswerUrl() {
         return mSubjectAnswerUrl;
     }
-    public void setIsAllSet( boolean isSet )
+
+    public String getSubjectIconUrl() {
+        return mSubjectIconUrl;
+    }
+
+    public void setSubjectIconUrl( String subjectIconUrl )
+    {
+        this.mSubjectIconUrl = subjectIconUrl;
+    }
+
+    public void setIsAllSet(boolean isSet )
     {
         mIsAllSet = isSet;
     }

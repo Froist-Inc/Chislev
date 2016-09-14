@@ -29,7 +29,7 @@ public class ChislevHandlerThread extends HandlerThread
     }
 
     public static final String TAG = "ChislevHandlerThread";
-    private static final String ANSWERS_FILENAME = "chislev_answer.sqlite";
+    private static final String ANSWERS_FILENAME = "answer.sqlite";
     static final int DATA_INITIALIZE = 0;
 
     Map<ChislevSubjectInformation, String> mData =
@@ -65,7 +65,7 @@ public class ChislevHandlerThread extends HandlerThread
         };
     }
 
-    private void HandleMessage(final ChislevSubjectInformation subject )
+    private void HandleMessage( final ChislevSubjectInformation subject )
     {
         final String code = mData.get( subject );
         try {
@@ -80,11 +80,13 @@ public class ChislevHandlerThread extends HandlerThread
                 // if getting the question throws an exception, we won't be here
                 mFileManager.SaveDataToFile( questions, subject.getSubjectFilename(), subject.getSubjectCode() );
             }
-            boolean answersDatabaseExists = mFileManager.FileExists( subject.getSubjectFilename(),
-                    subject.getSubjectCode(), false );
-            if( !answersDatabaseExists ){
-                byte[] answersData = mNetworkManager.GetData( subject.getSubjectAnswerUrl() );
-                mFileManager.SaveDataToFile( answersData, ANSWERS_FILENAME, subject.getSubjectCode() );
+
+            if( subject.getSubjectAnswerUrl() != null ){
+	            boolean answersDatabaseExists = mFileManager.FileExists( ANSWERS_FILENAME, subject.getSubjectCode(), false );
+	            if( !answersDatabaseExists ){
+	                byte[] answersData = mNetworkManager.GetData( subject.getSubjectAnswerUrl() );
+	                mFileManager.SaveDataToFile( answersData, ANSWERS_FILENAME, subject.getSubjectCode() );
+				}
             }
             subject.setIsAllSet( true );
             mMainUIHandler.post( new Runnable() {
@@ -97,6 +99,8 @@ public class ChislevHandlerThread extends HandlerThread
             });
         } catch ( IOException exception ){
             Log.e( TAG, exception.getLocalizedMessage(), exception );
+        } finally {
+            mData.remove( subject );
         }
     }
 
