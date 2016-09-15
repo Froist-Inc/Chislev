@@ -1,8 +1,5 @@
 package com.froist_inc.josh.completeprogrammingquiz;
 
-/**
- * Created by Josh on 12-Sep-16.
- */
 public class ChislevSubjectInformation
 {
     private String mSubjectName = null;

@@ -6,9 +6,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 
-/**
- * Created by Josh on 14-Sep-16.
- */
 public class ChislevChooseSubjectActivity extends FragmentActivity
 {
     @Override

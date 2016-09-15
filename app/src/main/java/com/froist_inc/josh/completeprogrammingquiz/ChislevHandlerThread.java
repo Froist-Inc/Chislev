@@ -12,9 +12,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by Josh on 13-Sep-16.
- */
 public class ChislevHandlerThread extends HandlerThread
 {
     private Handler mDefaultHandler;
@@ -92,7 +89,7 @@ public class ChislevHandlerThread extends HandlerThread
             mMainUIHandler.post( new Runnable() {
                 @Override
                 public void run() {
-                    if( mData.get( subject ) != code ) return;
+                    if( mData.get( subject ).equals( code ) ) return;
                     mData.remove( subject );
                     mListener.OnSubjectCodeDataObtained( subject );
                 }

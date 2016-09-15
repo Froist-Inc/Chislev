@@ -6,8 +6,7 @@
                 android:bottomRightRadius="10dp"
                 android:topLeftRadius="10dp"
                 android:topRightRadius="10dp"/>
-            <solid android:color="@color/colorPrimaryDark"/>
-            <stroke android:color="@color/colorAccent"/>
+            <solid android:color="@android:color/transparent"/>
         </shape>
     </item>
 </selector>

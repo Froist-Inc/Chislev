@@ -4,9 +4,6 @@ import android.content.Context;
 
 import java.util.ArrayList;
 
-/**
- * Created by Josh on 14-Sep-16.
- */
 public class ChislevSubjectsLaboratory
 {
     private static ChislevSubjectsLaboratory subjectsLaboratoryInstance;

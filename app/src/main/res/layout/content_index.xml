@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
+    android:background="@drawable/app_background"
     android:layout_alignParentBottom="true">
     <FrameLayout
         android:layout_width="match_parent"
@@ -17,76 +18,70 @@
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:paddingTop="@dimen/activity_vertical_margin"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
-            <HorizontalScrollView
+            <LinearLayout
+                android:background="@android:color/black"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/index_activity_bannerView"
-                android:layout_marginTop="41dp">
-                <LinearLayout
-                    android:layout_width="wrap_content"
+                android:layout_marginTop="50dp">
+                <ImageView
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal">
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="180dp"
-                        android:text="@string/index_activity_loading" />
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="180dp"
-                        android:text="@string/index_activity_scores"/>
-                </LinearLayout>
-            </HorizontalScrollView>
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/logo" />
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:gravity="center">
+
                 <Button
                     android:id="@+id/index_activity_new_quizButton"
-                    android:background="@drawable/custom_button_oval_shape"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
+                    android:layout_margin="15dp"
                     android:text="@string/index_activity_new_quiz"
-                    android:padding="25dp" />
+                    android:background="@drawable/custom_button_oval_shape" />
                 <Button
                     android:id="@+id/index_activity_scoreButton"
-                    android:text="@string/index_activity_scores"
-                    android:background="@drawable/custom_button_oval_shape"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:padding="25dp" />
+                    android:layout_margin="15dp"
+                    android:text="@string/index_activity_scores"
+                    android:background="@drawable/custom_button_oval_shape" />
                 <Button
                     android:id="@+id/index_activity_contributeButton"
-                    android:text="@string/index_activity_contribute"
-                    android:background="@drawable/custom_button_oval_shape"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:padding="25dp" />
+                    android:layout_margin="15dp"
+                    android:text="@string/index_activity_contribute"
+                    android:background="@drawable/custom_button_oval_shape" />
             </LinearLayout>
         </LinearLayout>
+
         <TableLayout
             android:id="@+id/index_activity_layoutMain"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:background="#FFFFFF"
+            android:background="@drawable/app_background"
             android:clickable="true">
             <TextView
                 android:id="@+id/index_activity_loadingTextView"
                 android:text="@string/index_activity_loading"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="100dp"
                 android:gravity="center"
+                android:layout_margin="15dp"
                 android:layout_gravity="center_horizontal"
-                style="@android:style/TextAppearance.Medium" />
+                style="@android:style/TextAppearance.Large" />
             <ProgressBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@android:style/Widget.ProgressBar.Large" />
         </TableLayout>
+
     </FrameLayout>
 </ScrollView>

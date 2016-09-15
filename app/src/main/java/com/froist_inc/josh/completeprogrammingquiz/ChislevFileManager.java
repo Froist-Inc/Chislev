@@ -11,9 +11,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Writer;
 
-/**
- * Created by Josh on 12-Sep-16.
- */
 public class ChislevFileManager
 {
     private Context mContext;
@@ -56,7 +53,7 @@ public class ChislevFileManager
             reader = new BufferedReader( new InputStreamReader( fileInputStream ) );
             StringBuilder stringBuilder = new StringBuilder();
 
-            String line = null;
+            String line;
             while( ( line = reader.readLine() ) != null ){
                 stringBuilder.append( line );
             }
@@ -69,7 +66,7 @@ public class ChislevFileManager
     public void SaveDataToFile( byte [] data, String filename, String parentDirectory ) throws IOException
     {
         Writer writer = null;
-        File newFile = null;
+        File newFile;
         try {
             if( parentDirectory != null ) {
                 File parentPath = mContext.getDir( parentDirectory, Context.MODE_PRIVATE );

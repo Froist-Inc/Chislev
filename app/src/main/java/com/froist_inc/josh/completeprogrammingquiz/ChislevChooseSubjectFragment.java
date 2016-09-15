@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,10 +15,6 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-/**
- * Created by Josh on 14-Sep-16.
- */
 
 public class ChislevChooseSubjectFragment extends DialogFragment
 {
@@ -36,6 +31,7 @@ public class ChislevChooseSubjectFragment extends DialogFragment
     public Dialog onCreateDialog( Bundle savedInstanceState )
     {
         mGridView = new GridView( getActivity() );
+        mGridView.setId( R.id.gridView );
         mGridView.setAdapter( new ChislevSubjectAdapter() );
         return new AlertDialog.Builder( getActivity() )
                 .setTitle( R.string.app_name ).setView( mGridView )

@@ -38,15 +38,17 @@ public class IndexActivity extends AppCompatActivity
         setSupportActionBar( toolbar );
 
         mViewLoading = findViewById( R.id.index_activity_layoutMain );
+        assert mViewLoading != null;
         mViewLoading.setVisibility( View.VISIBLE );
         mTextView = ( TextView ) findViewById( R.id.index_activity_loadingTextView );
 
         mStartQuizButton = ( Button ) findViewById( R.id.index_activity_new_quizButton );
-        mStartQuizButton.setOnClickListener(new View.OnClickListener() {
+        mStartQuizButton.setOnClickListener( new View.OnClickListener() {
             @Override
-            public void onClick( View v)
+            public void onClick( View v )
             {
-                //
+                Intent startQuizIntent = new Intent( IndexActivity.this, ChislevChooseSubjectActivity.class );
+                startActivity( startQuizIntent );
             }
         });
         LoadStartupConfigFile();
@@ -86,15 +88,15 @@ public class IndexActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected( MenuItem item )
-    {
+    public boolean onOptionsItemSelected( MenuItem item ) {
         int id = item.getItemId();
         // ToDo
-        if ( id == R.id.action_settings ) {
-            return true;
+        switch ( id ) {
+            case R.id.action_settings:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private void LoadStartupConfigFile()
@@ -128,7 +130,7 @@ public class IndexActivity extends AppCompatActivity
         protected ArrayList<ChislevSubjectInformation> doInBackground( Void... params )
         {
             File file = new File( CONFIG_FILENAME );
-            String data = null;
+            String data;
             ChislevFileManager fileManager = new ChislevFileManager( IndexActivity.this );
             try {
                 if( !file.exists() ){
@@ -151,10 +153,10 @@ public class IndexActivity extends AppCompatActivity
             try {
                 informationList = xmlSerializer.ParseConfigData( data );
             } catch ( XmlPullParserException exception ) {
-                Log.d( TAG, "Error parsing the result sent from the network. Contact your app admin: "
+                Log.d( TAG, "Error parsing the result sent from the network, contact your app admin.\nDetails: "
                         + exception.getLocalizedMessage(), exception );
             } catch ( IOException exception ) {
-                Log.d( TAG, "Error parsing the result sent from the network. Contact your app admin: "
+                Log.d( TAG, "Input/Output error occurred, please contact your app admin.\nDetails: "
                         + exception.getLocalizedMessage(), exception );
             }
             return informationList;

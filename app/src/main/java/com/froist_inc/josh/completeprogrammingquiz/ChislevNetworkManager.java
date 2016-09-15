@@ -9,10 +9,6 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-/**
- * Created by Josh on 11-Sep-16.
- */
-
 public class ChislevNetworkManager
 {
     Context mContext;
@@ -25,7 +21,7 @@ public class ChislevNetworkManager
 
     public byte[] GetData( String address ) throws IOException
     {
-        URL url = null;
+        URL url;
         HttpsURLConnection urlConnection = null;
 
         try {

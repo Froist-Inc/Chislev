@@ -10,9 +10,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 
-/**
- * Created by Josh on 12-Sep-16.
- */
 public class ChislevXMLSerializer
 {
     private Context mContext;
