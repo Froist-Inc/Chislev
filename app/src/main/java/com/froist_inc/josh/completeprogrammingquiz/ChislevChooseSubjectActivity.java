@@ -2,11 +2,9 @@ package com.froist_inc.josh.completeprogrammingquiz;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.Toolbar;
 
 public class ChislevChooseSubjectActivity extends FragmentActivity
 {
@@ -19,7 +17,10 @@ public class ChislevChooseSubjectActivity extends FragmentActivity
         setContentView( R.layout.subject_chooser_activity );
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        ChislevChooseSubjectFragment dialogFragment = new ChislevChooseSubjectFragment();
-        dialogFragment.show( fragmentManager, TAG );
+        Fragment fragment = fragmentManager.findFragmentById( R.id.subject_choose_layoutContainer );
+        if( fragment == null ){
+            fragment = new ChislevChooseSubjectFragment();
+            fragmentManager.beginTransaction().add( fragment, TAG ).commit();
+        }
     }
 }

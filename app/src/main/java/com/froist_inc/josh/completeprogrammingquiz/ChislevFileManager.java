@@ -1,16 +1,13 @@
 package com.froist_inc.josh.completeprogrammingquiz;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Writer;
 
 public class ChislevFileManager
 {
@@ -24,19 +21,19 @@ public class ChislevFileManager
 
     boolean FileExists( String filename )
     {
-        return new File( filename ).exists();
+        return new File( mContext.getFilesDir(), filename ).exists();
     }
 
     boolean FileExists( String filename, String parentDirectory, boolean createIfNotExists )
             throws IOException
     {
-        File parentDirectoryFile = new File( parentDirectory );
+        File parentDirectoryFile = new File( mContext.getFilesDir(), parentDirectory );
         if( !parentDirectoryFile.exists() ){
             if( createIfNotExists ){
                 if( !CreateDirectory( parentDirectory ) ) return false;
             }
         }
-        File file = new File( parentDirectoryFile.getCanonicalPath() + "/" + filename );
+        File file = new File( parentDirectoryFile.getCanonicalPath(), filename );
         return file.exists();
     }
 
@@ -66,11 +63,12 @@ public class ChislevFileManager
 
     public void SaveDataToFile( byte [] data, String filename, String parentDirectory ) throws IOException
     {
-        Writer writer = null;
+        FileOutputStream stream = null;
         File newFile;
         try {
+            File filesDir = mContext.getFilesDir();
             if( parentDirectory != null ) {
-                File parentPath = mContext.getDir( parentDirectory, Context.MODE_PRIVATE );
+                File parentPath = new File( filesDir, parentDirectory );
                 if( !parentPath.exists() ){
                     if( !parentPath.mkdirs() ){
                         throw new IOException( "Unable to create parent directory." );
@@ -78,17 +76,17 @@ public class ChislevFileManager
                 }
                 newFile = new File( parentPath, filename );
             } else {
-                newFile = new File( mContext.getFilesDir(), filename );
+                newFile = new File( filesDir, filename );
             }
             if( !newFile.exists() ){
                 if( !newFile.createNewFile() ){
                     throw new IOException( "Unable to create new file." );
                 }
             }
-            writer = new FileWriter( newFile );
-            writer.write( ChislevUtilities.ByteArrayToString( data ), 0, data.length );
+            stream = new FileOutputStream( newFile );
+            stream.write( data );
         } finally {
-            if( writer != null ) writer.close();
+            if( stream != null ) stream.close();
         }
     }
 }

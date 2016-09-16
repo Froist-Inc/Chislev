@@ -11,6 +11,7 @@ public class ChislevSubjectInformation
     private String mSubjectIconUrl = null;
 
     private boolean mIsAllSet = false;
+    private String mIconFilename = null;
     /**
      *
      * @param name name given to the subject, e.g. C++, Java, Analogy
@@ -59,7 +60,15 @@ public class ChislevSubjectInformation
 
     public void setSubjectIconUrl( String subjectIconUrl )
     {
-        this.mSubjectIconUrl = subjectIconUrl;
+        mSubjectIconUrl = subjectIconUrl;
+        if( subjectIconUrl != null ){
+            mIconFilename = "icon.png";
+        }
+    }
+
+    public String getIconFilename()
+    {
+        return mIconFilename;
     }
 
     public void setIsAllSet(boolean isSet )

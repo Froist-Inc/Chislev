@@ -1,91 +1,57 @@
 package com.froist_inc.josh.completeprogrammingquiz;
 
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-public class ChislevChooseSubjectFragment extends DialogFragment
+/**
+ * Created by Josh on 16-Sep-16.
+ */
+public class ChislevChooseSubjectFragment extends Fragment
 {
-    GridView mGridView;
     static private final String TAG = "ChooseSubjectFragment";
+    static public final int POSITION_REQUEST_CODE = 1;
+    static public final int LEVEL_REQUEST_CODE = 2;
+
+    private int mSubjectIndex = -1;
+
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
+    public void onCreate( @Nullable Bundle savedInstanceState )
     {
-        super.onCreate(savedInstanceState);
-        setRetainInstance( true );
+        super.onCreate( savedInstanceState );
     }
 
-    @NonNull
+    @Nullable
     @Override
-    public Dialog onCreateDialog( Bundle savedInstanceState )
+    public View onCreateView( LayoutInflater inflater, @Nullable ViewGroup container,
+                              @Nullable Bundle savedInstanceState )
     {
-        mGridView = new GridView( getActivity() );
-        mGridView.setId( R.id.gridView );
-        mGridView.setAdapter( new ChislevSubjectAdapter() );
-        return new AlertDialog.Builder( getActivity() )
-                .setTitle( R.string.app_name ).setView( mGridView )
-                .setNegativeButton( android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Todo --> bundle data back to target
-                        getActivity().finish();
-                    }
-                }).create();
+        View view = inflater.inflate( R.layout.subject_chooser_fragment, container );
+        ChislevChooseSubjectDialog dialogFragment = ChislevChooseSubjectDialog.NewInstance();
+        dialogFragment.setTargetFragment( ChislevChooseSubjectFragment.this, POSITION_REQUEST_CODE );
+        dialogFragment.show( getActivity().getSupportFragmentManager(), TAG );
+        return view;
     }
 
-    public static ChislevChooseSubjectFragment NewInstance()
+    @Override
+    public void onActivityResult( int requestCode, int resultCode, Intent data )
     {
-        // Todo --> will add extra data in Bundle, then attach bundle to ChislevChooseSubjectFragment
-        return new ChislevChooseSubjectFragment();
-    }
-
-    private class ChislevSubjectAdapter extends ArrayAdapter<ChislevSubjectInformation>
-    {
-        ChislevSubjectAdapter()
-        {
-            super( getActivity(), 0, ChislevSubjectsLaboratory.Get( getActivity() ).GetSubjects() );
-        }
-
-        @Override
-        public View getView( int position, View convertView, ViewGroup parent )
-        {
-            ChislevSubjectInformation subjectInformation = ChislevSubjectsLaboratory.Get( getActivity() )
-                    .GetSubjectItem( position );
-            if( convertView == null ){
-                convertView = getActivity().getLayoutInflater().inflate( R.layout.element_layout_fragment,parent,
-                        false );
+        super.onActivityResult( requestCode, resultCode, data );
+        if( requestCode == Activity.RESULT_CANCELED ) {
+            getActivity().finish();
+        } else {
+            if( requestCode == POSITION_REQUEST_CODE ){
+                mSubjectIndex = data.getIntExtra( ChislevChooseSubjectDialog.SUBJECT_POSITION, -1 );
+                getActivity().finish();
+//                ShowNextDialog();
+//            } else if ( requestCode == LEVEL_REQUEST_CODE ){
+//                mSubjectDifficultyLevel = data.getIntArrayExtra( ChislevChooseSubjectDialog.DIFFICULTY_LEVEL, -1 );
             }
-            ImageView imageView = ( ImageView ) convertView.findViewById( R.id.subject_item_imageView );
-            TextView textCaption = ( TextView ) convertView.findViewById( R.id.subject_item_captionTextView );
-            textCaption.setText( subjectInformation.getSubjectName() );
-
-            // Todo --> Verify correctness.
-            if( subjectInformation.getSubjectIconUrl() == null )
-            {
-                imageView.setImageResource( R.drawable.default_icon );
-            } else {
-                Bitmap bitmap = BitmapFactory.decodeFile( subjectInformation.getSubjectIconUrl() );
-                imageView.setImageBitmap( bitmap );
-            }
-            imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick( View v ) {
-                    // Todo --> Process onClicks
-                }
-            });
-            return convertView;
         }
     }
 }

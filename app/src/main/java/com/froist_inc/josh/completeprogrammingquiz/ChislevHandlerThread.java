@@ -27,6 +27,7 @@ public class ChislevHandlerThread extends HandlerThread
 
     public static final String TAG = "ChislevHandlerThread";
     private static final String ANSWERS_FILENAME = "answer.sqlite";
+    private static final String ICON_FILENAME = "icon.png";
     static final int DATA_INITIALIZE = 0;
 
     Map<ChislevSubjectInformation, String> mData =
@@ -74,8 +75,6 @@ public class ChislevHandlerThread extends HandlerThread
                     subject.getSubjectCode(), false );
             if( !subjectQuestionExists ){
                 byte[] questions = mNetworkManager.GetData( subject.getSubjectDataUrl() );
-                Log.d( TAG, "Data we're saving: " + ChislevUtilities.ByteArrayToString( questions ) );
-                // if getting the question throws an exception, we won't be here
                 mFileManager.SaveDataToFile( questions, subject.getSubjectFilename(), subject.getSubjectCode() );
             }
 
@@ -86,6 +85,15 @@ public class ChislevHandlerThread extends HandlerThread
 	                mFileManager.SaveDataToFile( answersData, ANSWERS_FILENAME, subject.getSubjectCode() );
 				}
             }
+            
+            if( subject.getSubjectIconUrl() != null ){
+				boolean iconExists = mFileManager.FileExists( ICON_FILENAME, subject.getSubjectCode(), false );
+				if( !iconExists ){
+                    byte[] iconData = mNetworkManager.GetData( subject.getSubjectIconUrl() );
+					mFileManager.SaveDataToFile( iconData, ICON_FILENAME, subject.getSubjectCode() );
+                }
+			}
+			
             subject.setIsAllSet( true );
             mMainUIHandler.post( new Runnable() {
                 @Override
@@ -96,7 +104,7 @@ public class ChislevHandlerThread extends HandlerThread
                 }
             });
         } catch ( IOException exception ){
-            Log.e( TAG, exception.getLocalizedMessage(), exception );
+            Log.d( TAG, exception.getLocalizedMessage(), exception );
         } finally {
             mData.remove( subject );
         }

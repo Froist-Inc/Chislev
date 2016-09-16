@@ -6,6 +6,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -20,20 +21,27 @@ public class ChislevXMLSerializer
         mContext = context;
     }
 
-    public ArrayList<ChislevSubjectInformation> ParseConfigData( String data )
-            throws XmlPullParserException, IOException
+    private XmlPullParser GetXMLParserForData( final String data )
+            throws XmlPullParserException
     {
-        if( data == null ) return null;
         XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
         XmlPullParser xmlPullParser = xmlPullParserFactory.newPullParser();
         xmlPullParser.setInput( new StringReader( data ) );
 
+        return xmlPullParser;
+    }
+
+    public ArrayList<ChislevSubjectInformation> ParseConfigData( String data )
+            throws XmlPullParserException, IOException
+    {
+        if( data == null ) return null;
         ArrayList<ChislevSubjectInformation> informationList = new ArrayList<>();
+        XmlPullParser xmlPullParser = GetXMLParserForData( data );
         ParseData( xmlPullParser, informationList );
         return informationList;
     }
 
-    public void ParseData(XmlPullParser xmlPullParser, ArrayList<ChislevSubjectInformation> informationList )
+    private void ParseData( XmlPullParser xmlPullParser, ArrayList<ChislevSubjectInformation> informationList )
             throws XmlPullParserException, IOException
     {
         int xmlEvent = xmlPullParser.next();
@@ -57,5 +65,59 @@ public class ChislevXMLSerializer
             }
             xmlEvent = xmlPullParser.next();
         }
+    }
+
+    public ArrayList<ChislevQuestion> ParseQuestions( final String parentDirectory, final String filename )
+            throws IOException, XmlPullParserException
+    {
+        File path = new File( parentDirectory, filename );
+        if( !path.exists() ){
+            throw new IOException( "File does not exist." );
+        }
+        String data = new ChislevFileManager( mContext ).ReadDataFromFile( path.getCanonicalPath() );
+        XmlPullParser xmlPullParser = GetXMLParserForData( data );
+        return ParseQuestionData( xmlPullParser );
+    }
+
+    ArrayList<ChislevQuestion> ParseQuestionData( XmlPullParser xmlPullParser )
+            throws IOException, XmlPullParserException
+    {
+        ArrayList<ChislevQuestion> questionList = new ArrayList<>();
+        int event = xmlPullParser.next();
+
+        while( event != XmlPullParser.END_DOCUMENT )
+        {
+            ChislevQuestion currentQuestion = new ChislevQuestion();
+            if( event == XmlPullParser.START_TAG && xmlPullParser.getName().toLowerCase().equals( "element" ) )
+            {
+                boolean isStartTag = event == XmlPullParser.START_TAG;
+                do {
+                    if( isStartTag && xmlPullParser.getName().toLowerCase().equals( "question" ) ){
+                        currentQuestion.setQuestion( xmlPullParser.getText().trim() );
+                    } else if( isStartTag && xmlPullParser.getName().toLowerCase().equals( "explanation" )){
+                        currentQuestion.setCorrectAnswer( xmlPullParser.getText().trim() );
+                    } else if( isStartTag && xmlPullParser.getName().toLowerCase().equals( "hint" ) ){
+                        currentQuestion.setHint( xmlPullParser.getText().trim() );
+                    } else if( isStartTag && xmlPullParser.getName().toLowerCase().equals( "code" ) ){
+                        currentQuestion.setCode( xmlPullParser.getText().trim() );
+                    } else if ( isStartTag && xmlPullParser.getName().toLowerCase().equals( "level" )){
+                        currentQuestion.setCode( xmlPullParser.getText().trim() );
+                    } else {
+                        if( isStartTag && xmlPullParser.getName().toLowerCase().equals( "options" ) ){
+                            ArrayList<String> options = new ArrayList<>();
+                            String[] text = xmlPullParser.getText().trim().split( "\\r?\\n" );
+                            for ( String t : text ) options.add( t );
+                            currentQuestion.setAvailableOptions( options );
+                        }
+                    }
+                    event = xmlPullParser.next();
+                    isStartTag = event == XmlPullParser.START_TAG;
+                } while ( !( XmlPullParser.END_TAG == event && xmlPullParser.getName().toLowerCase().equals( "element" ) )
+                        && event != XmlPullParser.END_DOCUMENT );
+            }
+            questionList.add( currentQuestion );
+            event = xmlPullParser.next();
+        }
+        return questionList;
     }
 }

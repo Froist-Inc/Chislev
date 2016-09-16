@@ -4,27 +4,17 @@ import java.util.ArrayList;
 
 public class ChislevQuestion
 {
-    private final String mOwner;
-    private final String mQuestion;
-    private final String mCode;
-    private final ArrayList<String> mAvailableOptions;
-    private final String mHint;
-    private final String mCorrectAnswer;
+    private String mOwner;
+    private String mQuestion;
+    private String mCode;
+    private ArrayList<String> mAvailableOptions;
+    private String mHint;
+    private String mCorrectAnswer;
 
     boolean mIsQuestionAnswered = false;
     int mAssociatedScore = 0;
 
-    public ChislevQuestion( final String questionOwner, final String question,
-                            final String questionCode, final String hintToQuestion,
-                            final String correctAnswer, ArrayList<String> availableOptions )
-    {
-        mOwner = questionOwner;
-        mQuestion = question;
-        mCode = questionCode;
-        mHint = hintToQuestion;
-        mCorrectAnswer = correctAnswer;
-        mAvailableOptions = availableOptions;
-    }
+    public ChislevQuestion() {}
 
     public boolean isQuestionAnswered()
     {
@@ -34,5 +24,53 @@ public class ChislevQuestion
     public void setIsQuestionAnswered( boolean questionAnswered )
     {
         mIsQuestionAnswered = questionAnswered;
+    }
+
+    public String getOwner() {
+        return mOwner;
+    }
+
+    public void setOwner( String mOwner ) {
+        this.mOwner = mOwner;
+    }
+
+    public String getQuestion() {
+        return mQuestion;
+    }
+
+    public void setQuestion( String mQuestion ) {
+        this.mQuestion = mQuestion;
+    }
+
+    public String getCode() {
+        return mCode;
+    }
+
+    public void setCode( String mCode ) {
+        this.mCode = mCode;
+    }
+
+    public ArrayList<String> getAvailableOptions() {
+        return mAvailableOptions;
+    }
+
+    public void setAvailableOptions( ArrayList<String> mAvailableOptions ) {
+        this.mAvailableOptions = mAvailableOptions;
+    }
+
+    public String getHint() {
+        return mHint;
+    }
+
+    public void setHint( String mHint ) {
+        this.mHint = mHint;
+    }
+
+    public String getCorrectAnswer() {
+        return mCorrectAnswer;
+    }
+
+    public void setCorrectAnswer( String mCorrectAnswer ) {
+        this.mCorrectAnswer = mCorrectAnswer;
     }
 }
