@@ -74,6 +74,7 @@ public class ChislevHandlerThread extends HandlerThread
                     subject.getSubjectCode(), false );
             if( !subjectQuestionExists ){
                 byte[] questions = mNetworkManager.GetData( subject.getSubjectDataUrl() );
+                Log.d( TAG, "Data we're saving: " + ChislevUtilities.ByteArrayToString( questions ) );
                 // if getting the question throws an exception, we won't be here
                 mFileManager.SaveDataToFile( questions, subject.getSubjectFilename(), subject.getSubjectCode() );
             }
@@ -89,7 +90,7 @@ public class ChislevHandlerThread extends HandlerThread
             mMainUIHandler.post( new Runnable() {
                 @Override
                 public void run() {
-                    if( mData.get( subject ).equals( code ) ) return;
+                    if( mData.get( subject ) != code ) return;
                     mData.remove( subject );
                     mListener.OnSubjectCodeDataObtained( subject );
                 }

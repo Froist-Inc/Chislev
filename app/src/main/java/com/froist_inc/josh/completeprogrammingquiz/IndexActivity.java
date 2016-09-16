@@ -101,7 +101,6 @@ public class IndexActivity extends AppCompatActivity
 
     private void LoadStartupConfigFile()
     {
-        Log.d( TAG, "Loading startup configuration file" );
         new ChislevLoadConfigFileTask().execute();
     }
 
@@ -112,8 +111,6 @@ public class IndexActivity extends AppCompatActivity
             Toast.makeText( IndexActivity.this, "Please make sure you're connected to the internet.", Toast.LENGTH_LONG ).show();
             mStartQuizButton.setEnabled( false );
         } else {
-            Toast.makeText( IndexActivity.this, "Sending the stuff to HandlerThread", Toast.LENGTH_LONG ).show();
-            mTextView.setText( R.string.sending_stuff );
             for ( int i = 0; i < ChislevSubjectsLaboratory.Get( this ).GetSubjects().size(); ++i ) {
                 mHandlerThread.Prepare( ChislevSubjectsLaboratory.Get( this ).GetSubjectItem( i ) );
             }
@@ -129,7 +126,7 @@ public class IndexActivity extends AppCompatActivity
         @Override
         protected ArrayList<ChislevSubjectInformation> doInBackground( Void... params )
         {
-            File file = new File( CONFIG_FILENAME );
+            File file = new File( getApplicationContext().getFilesDir() ,CONFIG_FILENAME );
             String data;
             ChislevFileManager fileManager = new ChislevFileManager( IndexActivity.this );
             try {
@@ -137,15 +134,12 @@ public class IndexActivity extends AppCompatActivity
                     byte[] result = new ChislevNetworkManager( IndexActivity.this ).GetData( CONFIG_URL );
                     if( result == null || result.length == 0 ) return null;
 
-                    Log.d( TAG, "Saving file." );
                     fileManager.SaveDataToFile( result, CONFIG_FILENAME, null );
                     data = ChislevUtilities.ByteArrayToString( result );
-                    Log.d( TAG, "Displaying data obtained: " + data );
                 } else {
                     data = fileManager.ReadDataFromFile( CONFIG_FILENAME );
                 }
             } catch ( IOException exception ) {
-                Log.d( TAG, exception.getLocalizedMessage(), exception );
                 return null;
             }
             ChislevXMLSerializer xmlSerializer = new ChislevXMLSerializer( IndexActivity.this );
@@ -165,7 +159,9 @@ public class IndexActivity extends AppCompatActivity
         @Override
         protected void onPostExecute( ArrayList<ChislevSubjectInformation> informationList )
         {
-            ChislevSubjectsLaboratory.Get( IndexActivity.this ).SetSubjects( informationList );
+            if( informationList != null ){
+                ChislevSubjectsLaboratory.Get( IndexActivity.this ).SetSubjects( informationList );
+            }
             UpdateMainThreadInformation();
         }
     }

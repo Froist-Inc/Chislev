@@ -19,6 +19,7 @@ import android.widget.TextView;
 public class ChislevChooseSubjectFragment extends DialogFragment
 {
     GridView mGridView;
+    static private final String TAG = "ChooseSubjectFragment";
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {

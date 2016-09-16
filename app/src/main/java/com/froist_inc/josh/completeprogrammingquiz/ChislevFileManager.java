@@ -6,6 +6,7 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -70,20 +71,23 @@ public class ChislevFileManager
         try {
             if( parentDirectory != null ) {
                 File parentPath = mContext.getDir( parentDirectory, Context.MODE_PRIVATE );
+                if( !parentPath.exists() ){
+                    if( !parentPath.mkdirs() ){
+                        throw new IOException( "Unable to create parent directory." );
+                    }
+                }
                 newFile = new File( parentPath, filename );
             } else {
-                newFile = new File( filename );
+                newFile = new File( mContext.getFilesDir(), filename );
             }
             if( !newFile.exists() ){
-                newFile.createNewFile();
-                Log.d( TAG, "New file created" );
+                if( !newFile.createNewFile() ){
+                    throw new IOException( "Unable to create new file." );
+                }
             }
             writer = new FileWriter( newFile );
-            Log.d( TAG, "Writing data to file" );
             writer.write( ChislevUtilities.ByteArrayToString( data ), 0, data.length );
-            Log.d( TAG, "Data successfully written to file. Balling out..." );
         } finally {
-            Log.d( TAG, "Closing file" );
             if( writer != null ) writer.close();
         }
     }

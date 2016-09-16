@@ -41,22 +41,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="15dp"
-                    android:text="@string/index_activity_new_quiz"
-                    android:background="@drawable/custom_button_oval_shape" />
+                    android:text="@string/index_activity_new_quiz" />
                 <Button
                     android:id="@+id/index_activity_scoreButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="15dp"
-                    android:text="@string/index_activity_scores"
-                    android:background="@drawable/custom_button_oval_shape" />
+                    android:text="@string/index_activity_scores" />
                 <Button
                     android:id="@+id/index_activity_contributeButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="15dp"
-                    android:text="@string/index_activity_contribute"
-                    android:background="@drawable/custom_button_oval_shape" />
+                    android:text="@string/index_activity_contribute" />
             </LinearLayout>
         </LinearLayout>
 

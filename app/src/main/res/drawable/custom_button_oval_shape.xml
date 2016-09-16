@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
+    <item android:state_activated="true">
         <shape android:shape="rectangle" android:useLevel="true">
             <corners android:bottomLeftRadius="10dp"
                 android:bottomRightRadius="10dp"
                 android:topLeftRadius="10dp"
                 android:topRightRadius="10dp"/>
             <solid android:color="@android:color/transparent"/>
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle" android:useLevel="true">
+            <corners android:bottomLeftRadius="10dp"
+                android:bottomRightRadius="10dp"
+                android:topLeftRadius="10dp"
+                android:topRightRadius="10dp"/>
         </shape>
     </item>
 </selector>

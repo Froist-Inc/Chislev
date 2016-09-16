@@ -40,7 +40,7 @@ public class ChislevSubjectsLaboratory
 
     private ChislevSubjectsLaboratory( Context context )
     {
-        mContext = context;
         mItems = new ArrayList<>();
+        mContext = context;
     }
 }
