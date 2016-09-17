@@ -90,6 +90,7 @@ public class ChislevXMLSerializer
             ChislevQuestion currentQuestion = new ChislevQuestion();
             if( event == XmlPullParser.START_TAG && xmlPullParser.getName().toLowerCase().equals( "element" ) )
             {
+                // todo lint says isStartTag is always true, I beg to defer. I'll look into this.
                 boolean isStartTag = event == XmlPullParser.START_TAG;
                 do {
                     if( isStartTag && xmlPullParser.getName().toLowerCase().equals( "question" ) ){
@@ -111,7 +112,7 @@ public class ChislevXMLSerializer
                         }
                     }
                     event = xmlPullParser.next();
-                    isStartTag = event == XmlPullParser.START_TAG;
+                    isStartTag = ( event == XmlPullParser.START_TAG );
                 } while ( !( XmlPullParser.END_TAG == event && xmlPullParser.getName().toLowerCase().equals( "element" ) )
                         && event != XmlPullParser.END_DOCUMENT );
             }

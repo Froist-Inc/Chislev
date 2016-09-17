@@ -5,6 +5,7 @@
     <string name="index_activity_loading">Please wait, fetching questions&#8230;</string>
     <string name="index_activity_new_quiz">New Quiz</string>
     <string name="index_activity_scores">Scores</string>
+    <string name="difficulty_level_title">Choose difficulty level</string>
     <string name="question_contributor">Question contributed by: %1$s </string>
     <string name="index_activity_contribute">Contribute new question</string>
 
