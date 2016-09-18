@@ -14,6 +14,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.File;
@@ -36,6 +41,17 @@ public class IndexActivity extends AppCompatActivity
         setContentView( R.layout.activity_index );
         Toolbar toolbar = ( Toolbar ) findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
+
+        MobileAds.initialize( getApplicationContext() );
+
+        AdView mAdView = ( AdView ) findViewById( R.id.footnote_adView );
+        mAdView.setAdSize( AdSize.BANNER );
+
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice( AdRequest.DEVICE_ID_EMULATOR )
+                .addTestDevice( "abcdefghijklmno" )
+                .build();
+        mAdView.loadAd( adRequest );
 
         mViewLoading = findViewById( R.id.index_activity_layoutMain );
         assert mViewLoading != null;

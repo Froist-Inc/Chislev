@@ -8,5 +8,6 @@
     <string name="difficulty_level_title">Choose difficulty level</string>
     <string name="question_contributor">Question contributed by: %1$s </string>
     <string name="index_activity_contribute">Contribute new question</string>
+    <string name="footnote_banner_ad_unit"> ca-app-pub-6531251854739248/5903891327 </string>
 
 </resources>
