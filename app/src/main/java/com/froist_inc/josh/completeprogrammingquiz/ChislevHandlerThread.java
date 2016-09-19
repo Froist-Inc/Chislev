@@ -52,7 +52,7 @@ public class ChislevHandlerThread extends HandlerThread
     protected void onLooperPrepared() {
         mDefaultHandler = new Handler(){
             @Override
-            public void handleMessage(Message msg)
+            public void handleMessage( Message msg )
             {
                 if( msg.what == ChislevHandlerThread.DATA_INITIALIZE ){
                     @SuppressWarnings( "unchecked" )
@@ -79,21 +79,21 @@ public class ChislevHandlerThread extends HandlerThread
             }
 
             if( subject.getSubjectAnswerUrl() != null ){
-	            boolean answersDatabaseExists = mFileManager.FileExists( ANSWERS_FILENAME, subject.getSubjectCode(), false );
-	            if( !answersDatabaseExists ){
-	                byte[] answersData = mNetworkManager.GetData( subject.getSubjectAnswerUrl() );
-	                mFileManager.SaveDataToFile( answersData, ANSWERS_FILENAME, subject.getSubjectCode() );
-				}
-            }
-            
-            if( subject.getSubjectIconUrl() != null ){
-				boolean iconExists = mFileManager.FileExists( ICON_FILENAME, subject.getSubjectCode(), false );
-				if( !iconExists ){
-                    byte[] iconData = mNetworkManager.GetData( subject.getSubjectIconUrl() );
-					mFileManager.SaveDataToFile( iconData, ICON_FILENAME, subject.getSubjectCode() );
+                boolean answersDatabaseExists = mFileManager.FileExists( ANSWERS_FILENAME, subject.getSubjectCode(), false );
+                if( !answersDatabaseExists ){
+                    byte[] answersData = mNetworkManager.GetData( subject.getSubjectAnswerUrl() );
+                    mFileManager.SaveDataToFile( answersData, ANSWERS_FILENAME, subject.getSubjectCode() );
                 }
-			}
-			
+            }
+
+            if( subject.getSubjectIconUrl() != null ){
+                boolean iconExists = mFileManager.FileExists( ICON_FILENAME, subject.getSubjectCode(), false );
+                if( !iconExists ){
+                    byte[] iconData = mNetworkManager.GetData( subject.getSubjectIconUrl() );
+                    mFileManager.SaveDataToFile( iconData, ICON_FILENAME, subject.getSubjectCode() );
+                }
+            }
+
             subject.setIsAllSet( true );
             mMainUIHandler.post( new Runnable() {
                 @Override

@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
@@ -25,20 +24,12 @@ import java.io.IOException;
 public class ChislevChooseSubjectDialog extends DialogFragment
 {
     public static final String SUBJECT_POSITION = "SUBJECT_CHOSEN";
-    GridView mGridView;
-
-    @Override
-    public void onCreate( @Nullable Bundle savedInstanceState )
-    {
-        super.onCreate(savedInstanceState);
-        setRetainInstance( true );
-    }
 
     @NonNull
     @Override
     public Dialog onCreateDialog( Bundle savedInstanceState )
     {
-        mGridView = new GridView( getActivity() );
+        GridView mGridView = new GridView( getActivity() );
         mGridView.setId( R.id.subjectGridView );
         mGridView.setAdapter( new ChislevSubjectAdapter() );
         mGridView.setOnItemClickListener( new AdapterView.OnItemClickListener() {

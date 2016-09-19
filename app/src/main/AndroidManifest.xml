@@ -25,7 +25,7 @@
         <activity android:name=".ChislevChooseSubjectActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".ChislevQuestionViewPagerActivity"
+        <activity android:name=".ChislevQuestionDisplayActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"/>
         <meta-data android:name="com.google.android.gms.version"

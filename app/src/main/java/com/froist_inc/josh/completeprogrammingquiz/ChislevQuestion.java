@@ -10,6 +10,7 @@ public class ChislevQuestion
     private ArrayList<String> mAvailableOptions;
     private String mHint;
     private String mCorrectAnswer;
+    private String mDifficultyLevel;
 
     boolean mIsQuestionAnswered = false;
     int mAssociatedScore = 0;
@@ -24,6 +25,14 @@ public class ChislevQuestion
     public void setIsQuestionAnswered( boolean questionAnswered )
     {
         mIsQuestionAnswered = questionAnswered;
+    }
+
+    public String getDifficultyLevel() {
+        return mDifficultyLevel;
+    }
+
+    public void setDifficultyLevel(String mDifficultyLevel) {
+        this.mDifficultyLevel = mDifficultyLevel;
     }
 
     public String getOwner() {

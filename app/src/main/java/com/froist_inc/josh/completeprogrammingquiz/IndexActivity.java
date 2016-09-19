@@ -14,11 +14,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
-
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.File;
@@ -32,7 +27,6 @@ public class IndexActivity extends AppCompatActivity
     ChislevHandlerThread mHandlerThread = null;
     int subjectsAvailable = 0;
     TextView mTextView = null;
-    private static String TAG = "IndexActivity";
 
     @Override
     protected void onCreate( Bundle savedInstanceState )
@@ -41,9 +35,8 @@ public class IndexActivity extends AppCompatActivity
         setContentView( R.layout.activity_index );
         Toolbar toolbar = ( Toolbar ) findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
-
+        /*
         MobileAds.initialize( getApplicationContext() );
-
         AdView mAdView = ( AdView ) findViewById( R.id.footnote_adView );
         mAdView.setAdSize( AdSize.BANNER );
 
@@ -52,7 +45,7 @@ public class IndexActivity extends AppCompatActivity
                 .addTestDevice( "abcdefghijklmno" )
                 .build();
         mAdView.loadAd( adRequest );
-
+        */
         mViewLoading = findViewById( R.id.index_activity_layoutMain );
         assert mViewLoading != null;
         mViewLoading.setVisibility( View.VISIBLE );
@@ -99,15 +92,14 @@ public class IndexActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu( Menu menu )
     {
-        getMenuInflater().inflate(R.menu.menu_index, menu);
+        getMenuInflater().inflate( R.menu.menu_index, menu );
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected( MenuItem item ) {
-        int id = item.getItemId();
         // ToDo
-        switch ( id ) {
+        switch ( item.getItemId() ) {
             case R.id.action_settings:
                 return true;
             default:
@@ -134,7 +126,7 @@ public class IndexActivity extends AppCompatActivity
         mViewLoading.setVisibility( View.INVISIBLE );
     }
 
-    private class ChislevLoadConfigFileTask extends AsyncTask<Void, Void, ArrayList<ChislevSubjectInformation>>
+    private class ChislevLoadConfigFileTask extends AsyncTask<Void, String, ArrayList<ChislevSubjectInformation>>
     {
         static final String CONFIG_URL = "https://raw.githubusercontent.com/Froist/Chislev/master/Data/config.xml";
         static final String CONFIG_FILENAME = "config.xml";
@@ -142,18 +134,20 @@ public class IndexActivity extends AppCompatActivity
         @Override
         protected ArrayList<ChislevSubjectInformation> doInBackground( Void... params )
         {
-            File file = new File( getApplicationContext().getFilesDir() ,CONFIG_FILENAME );
+            File file = new File( getApplicationContext().getFilesDir(), CONFIG_FILENAME );
             String data;
             ChislevFileManager fileManager = new ChislevFileManager( IndexActivity.this );
             try {
                 if( !file.exists() ){
+                    publishProgress( "Please wait, trying to fetch configuration information from the web." );
                     byte[] result = new ChislevNetworkManager( IndexActivity.this ).GetData( CONFIG_URL );
                     if( result == null || result.length == 0 ) return null;
 
+                    publishProgress( "Please wait, saving configuration file for further processing." );
                     fileManager.SaveDataToFile( result, CONFIG_FILENAME, null );
                     data = ChislevUtilities.ByteArrayToString( result );
                 } else {
-                    data = fileManager.ReadDataFromFile( CONFIG_FILENAME );
+                    data = fileManager.ReadDataFromFile( file.getCanonicalPath() );
                 }
             } catch ( IOException exception ) {
                 return null;
@@ -170,6 +164,12 @@ public class IndexActivity extends AppCompatActivity
                         + exception.getLocalizedMessage(), exception );
             }
             return informationList;
+        }
+
+        @Override
+        protected void onProgressUpdate( String... values )
+        {
+            mTextView.setText( values[0] );
         }
 
         @Override

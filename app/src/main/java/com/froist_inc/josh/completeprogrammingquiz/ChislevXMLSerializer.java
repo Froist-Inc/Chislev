@@ -10,6 +10,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ChislevXMLSerializer
 {
@@ -67,58 +70,72 @@ public class ChislevXMLSerializer
         }
     }
 
-    public ArrayList<ChislevQuestion> ParseQuestions( final String parentDirectory, final String filename )
+    public Map<String, ArrayList<ChislevQuestion>> ParseQuestions(final String parentDirectory, final String filename )
             throws IOException, XmlPullParserException
     {
-        File path = new File( parentDirectory, filename );
-        if( !path.exists() ){
+        ChislevFileManager fileManager = new ChislevFileManager( mContext );
+        if( !fileManager.FileExists( filename, parentDirectory, false ) ){
             throw new IOException( "File does not exist." );
         }
-        String data = new ChislevFileManager( mContext ).ReadDataFromFile( path.getCanonicalPath() );
+        File parentDirectoryFile = new File( mContext.getFilesDir(), parentDirectory );
+        File file = new File( parentDirectoryFile.getCanonicalPath(), filename );
+
+        String data = fileManager.ReadDataFromFile( file.getCanonicalPath() );
         XmlPullParser xmlPullParser = GetXMLParserForData( data );
         return ParseQuestionData( xmlPullParser );
     }
 
-    ArrayList<ChislevQuestion> ParseQuestionData( XmlPullParser xmlPullParser )
+    Map<String, ArrayList<ChislevQuestion>> ParseQuestionData( XmlPullParser xmlPullParser )
             throws IOException, XmlPullParserException
     {
-        ArrayList<ChislevQuestion> questionList = new ArrayList<>();
-        int event = xmlPullParser.next();
+        Map<String, ArrayList<ChislevQuestion>> questionMap = Collections.synchronizedMap( new HashMap<String,
+                ArrayList<ChislevQuestion>>());
 
-        while( event != XmlPullParser.END_DOCUMENT )
+        final String element = "Element", question = "Question", explanation = "Explanation", hint = "Hint",
+                code = "Code", level = "Level", options = "Options";
+
+        int eventType = xmlPullParser.next();
+        ChislevQuestion newQuestion = null;
+
+        while( eventType != XmlPullParser.END_DOCUMENT )
         {
-            ChislevQuestion currentQuestion = new ChislevQuestion();
-            if( event == XmlPullParser.START_TAG && xmlPullParser.getName().toLowerCase().equals( "element" ) )
+            switch ( eventType )
             {
-                // todo lint says isStartTag is always true, I beg to defer. I'll look into this.
-                boolean isStartTag = event == XmlPullParser.START_TAG;
-                do {
-                    if( isStartTag && xmlPullParser.getName().toLowerCase().equals( "question" ) ){
-                        currentQuestion.setQuestion( xmlPullParser.getText().trim() );
-                    } else if( isStartTag && xmlPullParser.getName().toLowerCase().equals( "explanation" )){
-                        currentQuestion.setCorrectAnswer( xmlPullParser.getText().trim() );
-                    } else if( isStartTag && xmlPullParser.getName().toLowerCase().equals( "hint" ) ){
-                        currentQuestion.setHint( xmlPullParser.getText().trim() );
-                    } else if( isStartTag && xmlPullParser.getName().toLowerCase().equals( "code" ) ){
-                        currentQuestion.setCode( xmlPullParser.getText().trim() );
-                    } else if ( isStartTag && xmlPullParser.getName().toLowerCase().equals( "level" )){
-                        currentQuestion.setCode( xmlPullParser.getText().trim() );
-                    } else {
-                        if( isStartTag && xmlPullParser.getName().toLowerCase().equals( "options" ) ){
-                            ArrayList<String> options = new ArrayList<>();
-                            String[] text = xmlPullParser.getText().trim().split( "\\r?\\n" );
-                            for ( String t : text ) options.add( t );
-                            currentQuestion.setAvailableOptions( options );
+                case XmlPullParser.START_TAG:
+                    final String name = xmlPullParser.getName();
+                    if( element.equals( name ) ){
+                        newQuestion = new ChislevQuestion();
+                    } else if( newQuestion != null ){
+                        if( question.equals( name )){
+                            newQuestion.setQuestion( xmlPullParser.nextText() );
+                        } else if( explanation.equals( name ) ){
+                            newQuestion.setCorrectAnswer( xmlPullParser.nextText() );
+                        } else if( hint.equals( name ) ){
+                            newQuestion.setHint( xmlPullParser.nextText() );
+                        } else if( code.equals( name )){
+                            newQuestion.setCode( xmlPullParser.nextText() );
+                        } else if( level.equals( name )){
+                            newQuestion.setDifficultyLevel( xmlPullParser.nextText() );
+                        } else if( options.equals( name ) ){
+                            final String text = xmlPullParser.nextText();
+                            ArrayList<String> elements = new ArrayList<>();
+                            String [] availableOptions = text.split( "\\r?\\n" );
+                            Collections.addAll( elements, availableOptions );
+                            newQuestion.setAvailableOptions( elements );
                         }
                     }
-                    event = xmlPullParser.next();
-                    isStartTag = ( event == XmlPullParser.START_TAG );
-                } while ( !( XmlPullParser.END_TAG == event && xmlPullParser.getName().toLowerCase().equals( "element" ) )
-                        && event != XmlPullParser.END_DOCUMENT );
+                    break;
+                case XmlPullParser.END_TAG:
+                    final String tagName = xmlPullParser.getName();
+                    if( tagName.equalsIgnoreCase( element ) && newQuestion != null ){
+                        if( questionMap.get( newQuestion.getDifficultyLevel() ) == null ){
+                            questionMap.put( newQuestion.getDifficultyLevel(), new ArrayList<ChislevQuestion>() );
+                        }
+                        questionMap.get( newQuestion.getDifficultyLevel() ).add( newQuestion );
+                    }
             }
-            questionList.add( currentQuestion );
-            event = xmlPullParser.next();
+            eventType = xmlPullParser.next();
         }
-        return questionList;
+        return questionMap;
     }
 }

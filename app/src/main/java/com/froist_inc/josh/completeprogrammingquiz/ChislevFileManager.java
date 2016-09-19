@@ -46,8 +46,10 @@ public class ChislevFileManager
     public String ReadDataFromFile( String filename ) throws IOException
     {
         BufferedReader reader = null;
+        FileInputStream fileInputStream = null;
+
         try {
-            FileInputStream fileInputStream = mContext.openFileInput( filename );
+            fileInputStream = new FileInputStream( filename );
             reader = new BufferedReader( new InputStreamReader( fileInputStream ) );
             StringBuilder stringBuilder = new StringBuilder();
 
@@ -58,6 +60,7 @@ public class ChislevFileManager
             return stringBuilder.toString();
         } finally {
             if( reader != null ) reader.close();
+            if( fileInputStream != null ) fileInputStream.close();
         }
     }
 

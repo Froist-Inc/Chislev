@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
@@ -21,14 +20,7 @@ import java.util.ArrayList;
 public class ChislevChooseLevelDialog extends DialogFragment
 {
     public static final String DIFFICULTY_LEVEL = "DIFFICULTY_LEVEL";
-    private static final int LEVEL_SIZE = 4; // Beginner, Intermediate, Advanced, Level -- in that particular order.
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
-    {
-        super.onCreate( savedInstanceState );
-        setRetainInstance( true );
-    }
+    private static final int LEVEL_SIZE = 4; // Beginner, Intermediate, Advanced, Random Level -- in that particular order.
 
     @NonNull
     @Override
@@ -38,7 +30,7 @@ public class ChislevChooseLevelDialog extends DialogFragment
         levelGridView.setId( R.id.levelGridView );
         ArrayList<Integer> dummyList = new ArrayList<>();
         for ( int i = 0; i != LEVEL_SIZE; i++ ) {
-            dummyList.add( Integer.valueOf( i ) );
+            dummyList.add(i);
         }
         levelGridView.setAdapter( new ChislevLevelAdapter( dummyList ) );
         levelGridView.setOnItemClickListener( new AdapterView.OnItemClickListener() {

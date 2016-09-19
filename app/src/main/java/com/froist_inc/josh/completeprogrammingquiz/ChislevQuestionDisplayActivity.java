@@ -2,8 +2,14 @@ package com.froist_inc.josh.completeprogrammingquiz;
 
 import android.support.v4.app.Fragment;
 
-public class ChislevChooseSubjectActivity extends ChislevGenericActivity
+public class ChislevQuestionDisplayActivity extends ChislevGenericActivity
 {
+    @Override
+    public Fragment GetFragment()
+    {
+        return new ChislevQuestionDisplayFragment();
+    }
+
     @Override
     public int GetLayoutID() {
         return R.layout.subject_chooser_activity;
@@ -12,10 +18,5 @@ public class ChislevChooseSubjectActivity extends ChislevGenericActivity
     @Override
     public int GetContainerID() {
         return R.id.subject_choose_layoutContainer;
-    }
-
-    public Fragment GetFragment()
-    {
-        return new ChislevChooseSubjectFragment();
     }
 }

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,13 +22,14 @@ public class ChislevChooseSubjectFragment extends Fragment
     public void onCreate( @Nullable Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
+        setRetainInstance( true );
     }
 
     @Nullable
     @Override
     public View onCreateView( LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState )
     {
-        View view = inflater.inflate( R.layout.subject_chooser_fragment, container );
+        View view = inflater.inflate( R.layout.subject_chooser_fragment, container, false );
         ChislevChooseSubjectDialog dialogFragment = ChislevChooseSubjectDialog.NewInstance();
         dialogFragment.setTargetFragment( ChislevChooseSubjectFragment.this, POSITION_REQUEST_CODE );
         dialogFragment.show( getActivity().getSupportFragmentManager(), TAG );
@@ -48,26 +48,8 @@ public class ChislevChooseSubjectFragment extends Fragment
                 ShowLevelDialog();
             } else if ( requestCode == LEVEL_REQUEST_CODE ){
                 mSubjectDifficultyLevel = data.getIntExtra( ChislevChooseLevelDialog.DIFFICULTY_LEVEL, -1 );
-                final String logString = "Chosen subject is: " + ChislevSubjectsLaboratory.Get( getActivity() ).GetSubjectItem( mSubjectIndex ).getSubjectName() +
-                        " and difficulty is: " + DifficultyLevelToString( mSubjectDifficultyLevel );
-                Log.d( TAG, logString );
-                getActivity().finish();
+                DisplayQuestionPage();
             }
-        }
-    }
-
-    private static String DifficultyLevelToString( int level )
-    {
-        switch ( level )
-        {
-            case 0:
-                return "Beginner";
-            case 1:
-                return "Intermediate";
-            case 2:
-                return "Advanced";
-            default:
-                return "Random";
         }
     }
 
@@ -76,5 +58,12 @@ public class ChislevChooseSubjectFragment extends Fragment
         ChislevChooseLevelDialog levelDialog = new ChislevChooseLevelDialog();
         levelDialog.setTargetFragment( ChislevChooseSubjectFragment.this, LEVEL_REQUEST_CODE );
         levelDialog.show( getActivity().getSupportFragmentManager(), TAG );
+    }
+
+    private void DisplayQuestionPage()
+    {
+        final Intent questionIntent = ChislevQuestionDisplayFragment.GetQuestionDisplayIntent( getActivity(),
+                mSubjectIndex, mSubjectDifficultyLevel );
+        startActivity( questionIntent );
     }
 }
