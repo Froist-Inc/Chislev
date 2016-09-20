@@ -11,6 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -26,17 +29,72 @@ public class ChislevQuestionDisplayFragment extends Fragment
     private CountDownTimer mCountDownTimer;
 
     private ArrayList<ChislevQuestion> mQuestionList;
+    int mCurrentQuestionIndex = 0;
     int mSubjectIndex, mLevel;
+
+    WebView mCodeView;
+    ImageButton mNextQuestionButton, mPrevQuestionButton;
+    TextView mContributorTextView, mTimerTextView, mQuestionTextView;
+    RadioButton mFirstOptionRadio, mSecondOptionRadio, mThirdOptionRadio, mFourthOptionRadio;
+    View coverView = null, view = null;
+
+    private void UpdateQuestionView( int index )
+    {
+        if( view == null || mQuestionList == null ) return;
+        ChislevQuestion currentQuestion = mQuestionList.get( index );
+
+        mCodeView.loadData( currentQuestion.getCode(), "text/html", "UTF-8" );
+        if( index == 0 ){
+            mPrevQuestionButton.setEnabled( false );
+        } else if( index == ( mQuestionList.size() - 1 ) ){
+            mNextQuestionButton.setEnabled( false );
+        }
+
+        if( currentQuestion.getOwner() == null ){
+            mContributorTextView.setText( getString( R.string.question_contributor, "The C++ Community" ) );
+        } else {
+            mContributorTextView.setText( getString( R.string.question_contributor, currentQuestion.getOwner() ));
+        }
+        mQuestionTextView.setText( currentQuestion.getQuestion().trim() );
+        mFourthOptionRadio.setText( currentQuestion.getAvailableOptions().get( index ));
+    }
 
     @Nullable
     @Override
     public View onCreateView( LayoutInflater inflater, @Nullable ViewGroup container,
                               @Nullable Bundle savedInstanceState )
     {
-        View view = inflater.inflate( R.layout.question_page_fragment, container, false );
-        WebView webView = ( WebView ) view.findViewById( R.id.question_codeWebView );
-        webView.setClickable( true );
-        webView.loadData( getString( R.string.index_activity_new_quiz ), "text/html", "UTF-8" );
+        view = inflater.inflate( R.layout.question_page_fragment, container, false );
+        coverView = view.findViewById( R.id.question_page_coverLayout );
+        coverView.setVisibility( View.VISIBLE );
+
+        mPrevQuestionButton = ( ImageButton ) view.findViewById( R.id.prevButton );
+        mNextQuestionButton = ( ImageButton ) view.findViewById( R.id.nextButton );
+
+        mPrevQuestionButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick( View v ) {
+                if( mCurrentQuestionIndex == 0 ) return;
+                mCurrentQuestionIndex = ( mCurrentQuestionIndex - 1 ) % mQuestionList.size();
+                UpdateQuestionView( mCurrentQuestionIndex );
+            }
+        });
+        mNextQuestionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCurrentQuestionIndex = ( mCurrentQuestionIndex + 1 ) % mQuestionList.size();
+                UpdateQuestionView( mCurrentQuestionIndex );
+            }
+        });
+        mCodeView = ( WebView ) view.findViewById( R.id.question_codeWebView );
+        mCodeView.setClickable( true );
+        mTimerTextView = ( TextView ) view.findViewById( R.id.timer_textView );
+        mContributorTextView = ( TextView ) view.findViewById( R.id.contributor_textView );
+        mQuestionTextView = ( TextView ) view.findViewById( R.id.question_textView );
+        mFirstOptionRadio = ( RadioButton ) view.findViewById( R.id.question_option_oneRadioButton );
+        mSecondOptionRadio = ( RadioButton ) view.findViewById( R.id.question_option_twoRadioButton );
+        mThirdOptionRadio = ( RadioButton ) view.findViewById( R.id.question_option_threeRadioButton );
+        mFourthOptionRadio = ( RadioButton ) view.findViewById( R.id.question_option_fourRadioButton );
         return view;
     }
 
@@ -64,7 +122,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
             @Override
             public void onTick( long millisUntilFinished )
             {
-
+                mTimerTextView.setText( "" + ( millisUntilFinished / 1000 ) + "s left." );
             }
 
             @Override
@@ -73,6 +131,8 @@ public class ChislevQuestionDisplayFragment extends Fragment
 
             }
         }.start();
+        coverView.setVisibility( View.INVISIBLE );
+        UpdateQuestionView( mCurrentQuestionIndex );
     }
 
     // Todo -> save array index and some other housekeeping information
@@ -111,7 +171,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
                 final String filteringLevel = LevelToString( mLevel );
                 ArrayList<ChislevQuestion> questions = questionMap.get( filteringLevel );
                 if( questions != null ) {
-                    Collections.shuffle(questions);
+                    Collections.shuffle( questions );
                 }
                 return questions;
             } catch( IOException except ) {

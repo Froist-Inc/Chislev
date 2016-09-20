@@ -115,7 +115,7 @@ public class ChislevXMLSerializer
                         } else if( code.equals( name )){
                             newQuestion.setCode( xmlPullParser.nextText() );
                         } else if( level.equals( name )){
-                            newQuestion.setDifficultyLevel( xmlPullParser.nextText() );
+                            newQuestion.setDifficultyLevel( xmlPullParser.nextText().trim() );
                         } else if( options.equals( name ) ){
                             final String text = xmlPullParser.nextText();
                             ArrayList<String> elements = new ArrayList<>();
