@@ -1,184 +1,127 @@
 package com.froist_inc.josh.completeprogrammingquiz;
 
-import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 public class IndexActivity extends AppCompatActivity
 {
-    View mViewLoading = null;
-    Button mStartQuizButton = null;
-    ChislevHandlerThread mHandlerThread = null;
-    int subjectsAvailable = 0;
-    TextView mTextView = null;
+    private CharSequence mDrawerTitle;
+    private CharSequence mTitle;
+    private String[] mIndexTitles;
+    private DrawerLayout mDrawLayout;
+    private ListView mDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
 
     @Override
-    protected void onCreate( Bundle savedInstanceState )
+    protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_index );
-        Toolbar toolbar = ( Toolbar ) findViewById( R.id.toolbar );
+        mTitle = mDrawerTitle = getTitle();
+
+        mIndexTitles = getResources().getStringArray( R.array.index_menu_overlay_item );
+        mDrawLayout = ( DrawerLayout ) findViewById( R.id.drawer_layout );
+        mDrawerList = ( ListView ) findViewById( R.id.drawer_listView );
+
+        mDrawerList.setAdapter( new ArrayAdapter<>( this, R.layout.drawer_list_layout, mIndexTitles ));
+        mDrawerList.setOnItemClickListener( new DrawerItemClickListener() );
+
+        Toolbar toolbar = ( Toolbar) findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
-        /*
-        MobileAds.initialize( getApplicationContext() );
-        AdView mAdView = ( AdView ) findViewById( R.id.footnote_adView );
-        mAdView.setAdSize( AdSize.BANNER );
 
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice( AdRequest.DEVICE_ID_EMULATOR )
-                .addTestDevice( "abcdefghijklmno" )
-                .build();
-        mAdView.loadAd( adRequest );
-        */
-        mViewLoading = findViewById( R.id.index_activity_layoutMain );
-        assert mViewLoading != null;
-        mViewLoading.setVisibility( View.VISIBLE );
-        mTextView = ( TextView ) findViewById( R.id.index_activity_loadingTextView );
+        getSupportActionBar().setDisplayHomeAsUpEnabled( true );
+        getSupportActionBar().setHomeButtonEnabled( true );
 
-        mStartQuizButton = ( Button ) findViewById( R.id.index_activity_new_quizButton );
-        mStartQuizButton.setOnClickListener( new View.OnClickListener() {
+        mDrawerToggle = new ActionBarDrawerToggle( this, mDrawLayout, toolbar, android.R.string.copy,
+                android.R.string.cancel ){
             @Override
-            public void onClick( View v )
-            {
-                Intent startQuizIntent = new Intent( IndexActivity.this, ChislevChooseSubjectActivity.class );
-                startActivity( startQuizIntent );
+            public void onDrawerClosed( View drawerView) {
+                getSupportActionBar().setTitle( R.string.app_name );
+                invalidateOptionsMenu();
             }
-        });
-        LoadStartupConfigFile();
-        mHandlerThread = new ChislevHandlerThread( this, new Handler() );
-        mHandlerThread.setListener( new ChislevHandlerThread.Listener() {
+
             @Override
-            public void OnSubjectCodeDataObtained( ChislevSubjectInformation subjectInformation )
-            {
-                if( subjectInformation.isAllSet() ){
-                    ++subjectsAvailable;
-                    Toast.makeText( IndexActivity.this, subjectInformation.getSubjectName() + " is available", 
-						Toast.LENGTH_LONG ).show();
-                }
-                if( subjectsAvailable > 0 && !mStartQuizButton.isEnabled() ){
-                    mStartQuizButton.setEnabled( true );
-                }
+            public void onDrawerOpened(View drawerView) {
+                getSupportActionBar().setTitle( R.string.menu_item );
+                invalidateOptionsMenu();
             }
-        });
-
-        mHandlerThread.start();
-        mHandlerThread.getLooper();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if( mHandlerThread != null ){
-            mHandlerThread.quit();
+        };
+        mDrawLayout.addDrawerListener( mDrawerToggle );
+        if( savedInstanceState == null ){
+            selectItem( 0 );
         }
     }
 
     @Override
-    public boolean onCreateOptionsMenu( Menu menu )
-    {
+    public boolean onCreateOptionsMenu( Menu menu ){
         getMenuInflater().inflate( R.menu.menu_index, menu );
-        return true;
+        return super.onCreateOptionsMenu( menu );
     }
 
     @Override
     public boolean onOptionsItemSelected( MenuItem item ) {
-        // ToDo
-        switch ( item.getItemId() ) {
-            case R.id.action_settings:
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if( mDrawerToggle.onOptionsItemSelected( item )){
+            return true;
+        }
+        return super.onOptionsItemSelected( item );
+    }
+
+    private class DrawerItemClickListener implements ListView.OnItemClickListener
+    {
+        @Override
+        public void onItemClick( AdapterView<?> parent, View view, int position, long id ){
+            selectItem( position );
         }
     }
 
-    private void LoadStartupConfigFile()
+    @Override
+    public boolean onPrepareOptionsMenu( Menu menu )
     {
-        new ChislevLoadConfigFileTask().execute();
+        boolean drawerOpen = mDrawLayout.isDrawerOpen( mDrawerList );
+        menu.findItem( R.id.action_settings ).setVisible( !drawerOpen );
+        return super.onPrepareOptionsMenu(menu);
     }
 
-    private void UpdateMainThreadInformation()
+    // Todo
+    private void selectItem( int position )
     {
-        if( ChislevSubjectsLaboratory.Get( this ).GetSubjects().size() == 0 )
-        {
-            Toast.makeText( IndexActivity.this, "Please make sure you're connected to the internet.", Toast.LENGTH_LONG ).show();
-            mStartQuizButton.setEnabled( false );
-        } else {
-            for ( int i = 0; i < ChislevSubjectsLaboratory.Get( this ).GetSubjects().size(); ++i ) {
-                mHandlerThread.Prepare( ChislevSubjectsLaboratory.Get( this ).GetSubjectItem( i ) );
-            }
+        Fragment fragmentToShow = null;
+        switch ( position ){
+            case 0: // lists of quiz
+                fragmentToShow = new ChislevSubjectPresenterFragments();
+                break;
+            // Todo
+            case 1: default:
+                fragmentToShow = null;
+                break;
         }
-        mViewLoading.setVisibility( View.INVISIBLE );
+        getSupportFragmentManager().beginTransaction().replace( R.id.drawer_mainLayout, fragmentToShow ).commit();
+        mDrawerList.setItemChecked( position, true );
+        mDrawLayout.closeDrawer( mDrawerList );
     }
 
-    private class ChislevLoadConfigFileTask extends AsyncTask<Void, String, ArrayList<ChislevSubjectInformation>>
+    @Override
+    protected void onPostCreate( @Nullable Bundle savedInstanceState ) {
+        super.onPostCreate( savedInstanceState );
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig)
     {
-        static final String CONFIG_URL = "https://raw.githubusercontent.com/Froist/Chislev/master/Data/config.xml";
-        static final String CONFIG_FILENAME = "config.xml";
-        static final String TAG = "LoadConfigFileTask";
-        @Override
-        protected ArrayList<ChislevSubjectInformation> doInBackground( Void... params )
-        {
-            File file = new File( getApplicationContext().getFilesDir(), CONFIG_FILENAME );
-            String data;
-            ChislevFileManager fileManager = new ChislevFileManager( IndexActivity.this );
-            try {
-                if( !file.exists() ){
-                    publishProgress( "Please wait, trying to fetch configuration information from the web." );
-                    byte[] result = new ChislevNetworkManager( IndexActivity.this ).GetData( CONFIG_URL );
-                    if( result == null || result.length == 0 ) return null;
-
-                    publishProgress( "Please wait, saving configuration file for further processing." );
-                    fileManager.SaveDataToFile( result, CONFIG_FILENAME, null );
-                    data = ChislevUtilities.ByteArrayToString( result );
-                } else {
-                    data = fileManager.ReadDataFromFile( file.getCanonicalPath() );
-                }
-            } catch ( IOException exception ) {
-                return null;
-            }
-            ChislevXMLSerializer xmlSerializer = new ChislevXMLSerializer( IndexActivity.this );
-            ArrayList<ChislevSubjectInformation> informationList = null;
-            try {
-                informationList = xmlSerializer.ParseConfigData( data );
-            } catch ( XmlPullParserException exception ) {
-                Log.d( TAG, "Error parsing the result sent from the network, contact your app admin.\nDetails: "
-                        + exception.getLocalizedMessage(), exception );
-            } catch ( IOException exception ) {
-                Log.d( TAG, "Input/Output error occurred, please contact your app admin.\nDetails: "
-                        + exception.getLocalizedMessage(), exception );
-            }
-            return informationList;
-        }
-
-        @Override
-        protected void onProgressUpdate( String... values )
-        {
-            mTextView.setText( values[0] );
-        }
-
-        @Override
-        protected void onPostExecute( ArrayList<ChislevSubjectInformation> informationList )
-        {
-            if( informationList != null ){
-                ChislevSubjectsLaboratory.Get( IndexActivity.this ).SetSubjects( informationList );
-            }
-            UpdateMainThreadInformation();
-        }
+        super.onConfigurationChanged( newConfig );
+        mDrawerToggle.onConfigurationChanged( newConfig );
     }
 }

@@ -22,11 +22,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 public class ChislevQuestionDisplayFragment extends Fragment
 {
     private static final String EXTRA_INDEX = "EXTRA_INDEX", EXTRA_LEVEL = "EXTRA_LEVEL", EXTRA = "EXTRA_DATA";
     private CountDownTimer mCountDownTimer;
+
+    private final int QUESTION_SIZE = 5;
 
     private ArrayList<ChislevQuestion> mQuestionList;
     int mCurrentQuestionIndex = 0;
@@ -36,7 +40,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
     ImageButton mNextQuestionButton, mPrevQuestionButton;
     TextView mContributorTextView, mTimerTextView, mQuestionTextView;
     RadioButton mFirstOptionRadio, mSecondOptionRadio, mThirdOptionRadio, mFourthOptionRadio;
-    View coverView = null, view = null;
+    View /* coverView = null, */ view = null;
 
     private void UpdateQuestionView( int index )
     {
@@ -56,7 +60,10 @@ public class ChislevQuestionDisplayFragment extends Fragment
             mContributorTextView.setText( getString( R.string.question_contributor, currentQuestion.getOwner() ));
         }
         mQuestionTextView.setText( currentQuestion.getQuestion().trim() );
-        mFourthOptionRadio.setText( currentQuestion.getAvailableOptions().get( index ));
+        mFirstOptionRadio.setText( currentQuestion.getAvailableOptions().get( 0 ));
+        mSecondOptionRadio.setText( currentQuestion.getAvailableOptions().get( 1 ));
+        mThirdOptionRadio.setText( currentQuestion.getAvailableOptions().get( 2 ));
+        mFourthOptionRadio.setText( currentQuestion.getAvailableOptions().get( 3 ));
     }
 
     @Nullable
@@ -65,8 +72,8 @@ public class ChislevQuestionDisplayFragment extends Fragment
                               @Nullable Bundle savedInstanceState )
     {
         view = inflater.inflate( R.layout.question_page_fragment, container, false );
-        coverView = view.findViewById( R.id.question_page_coverLayout );
-        coverView.setVisibility( View.VISIBLE );
+//        coverView = view.findViewById( R.id.question_page_coverLayout );
+//        coverView.setVisibility( View.VISIBLE );
 
         mPrevQuestionButton = ( ImageButton ) view.findViewById( R.id.prevButton );
         mNextQuestionButton = ( ImageButton ) view.findViewById( R.id.nextButton );
@@ -122,7 +129,19 @@ public class ChislevQuestionDisplayFragment extends Fragment
             @Override
             public void onTick( long millisUntilFinished )
             {
-                mTimerTextView.setText( "" + ( millisUntilFinished / 1000 ) + "s left." );
+                long x = millisUntilFinished / 1000;
+                long seconds = x % 60;
+                x /= 60;
+                int minutes = ( int ) x % 60;
+                x /= 60;
+                int hours = ( int ) x % 24;
+                x /= 24;
+                int days = ( int ) x;
+                String text = "" + ( days > 0 ? ( days + " day(s), " ) : "" ) +
+                        ( hours > 0 ? ( hours + "h" ) : "" ) +
+                        ( minutes > 0 ? ( minutes + "m" ) : "" ) +
+                        seconds + "s";
+                mTimerTextView.setText( text );
             }
 
             @Override
@@ -131,7 +150,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
 
             }
         }.start();
-        coverView.setVisibility( View.INVISIBLE );
+//        coverView.setVisibility( View.INVISIBLE );
         UpdateQuestionView( mCurrentQuestionIndex );
     }
 
@@ -144,6 +163,25 @@ public class ChislevQuestionDisplayFragment extends Fragment
 
     private class ChislevSubjectProcessingTask extends AsyncTask<Void, Void, ArrayList<ChislevQuestion> >
     {
+        private ArrayList<ChislevQuestion> FilterQuestions( final Map<String, ArrayList<ChislevQuestion> > questionMap,
+                                                            final String filterCriteria )
+        {
+            boolean notRandom = filterCriteria.compareToIgnoreCase( "Beginner" ) == 0 ||
+                    filterCriteria.compareToIgnoreCase( "Intermediate" ) == 0 ||
+                    filterCriteria.compareToIgnoreCase( "Advanced" ) == 0;
+            ArrayList<ChislevQuestion> questions = null;
+            if( !notRandom ){
+                questions = questionMap.get( filterCriteria );
+            } else {
+                // TODO: 24-Sep-16
+                questions = questionMap.get( "Intermediate" );
+            }
+            if ( questions != null ){
+                Collections.shuffle( questions );
+            }
+            return questions;
+        }
+
         private String LevelToString( int level )
         {
             switch( level ){
@@ -169,11 +207,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
                 Map<String, ArrayList<ChislevQuestion> > questionMap =
                         xmlSerializer.ParseQuestions( subjectInformation.getSubjectCode(), subjectInformation.getSubjectFilename() );
                 final String filteringLevel = LevelToString( mLevel );
-                ArrayList<ChislevQuestion> questions = questionMap.get( filteringLevel );
-                if( questions != null ) {
-                    Collections.shuffle( questions );
-                }
-                return questions;
+                return FilterQuestions( questionMap, filteringLevel );
             } catch( IOException except ) {
 //                Todo
 //                Log.d();

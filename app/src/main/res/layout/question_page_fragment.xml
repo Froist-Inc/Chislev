@@ -5,24 +5,29 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:ads="http://schemas.android.com/apk/res-auto">
 
-    <RelativeLayout android:layout_width="match_parent"
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp">
-        <com.google.android.gms.ads.AdView
-            android:id="@+id/banner_adView"
-            ads:adSize="BANNER"
-            ads:adUnitId="@string/footnote_banner_ad_unit"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentTop="true"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:gravity="center"
             android:layout_height="wrap_content">
-        </com.google.android.gms.ads.AdView>
+            <com.google.android.gms.ads.AdView
+                android:id="@+id/banner_adView"
+                ads:adSize="BANNER"
+                ads:adUnitId="@string/footnote_banner_ad_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </com.google.android.gms.ads.AdView>
+        </LinearLayout>
         <RelativeLayout
-            android:layout_below="@id/banner_adView"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <TextView
                 android:layout_width="wrap_content"
+                android:layout_margin="10dp"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="@string/timer_display"
@@ -56,6 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/question_codeWebView"
+                android:background="@android:color/transparent"
                 android:layout_margin="10dp"
                 android:layout_below="@+id/question_textView"
                 android:layout_alignLeft="@+id/question_textView"
@@ -91,7 +97,7 @@
                     android:text="@string/app_name" />
             </RadioGroup>
 
-            <FrameLayout
+            <RelativeLayout
                 android:layout_centerHorizontal="true"
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
@@ -104,53 +110,40 @@
                     android:layout_height="wrap_content"
                     android:src="@drawable/arrow_left"
                     android:id="@+id/prevButton"
+                    android:background="@drawable/rect"
                     android:contentDescription="@string/prev"
                     android:layout_gravity="left|top" />
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/hint"
-                    android:id="@+id/showHintButton"
-                    android:layout_gravity="center_horizontal|top" />
                 <ImageButton
                     android:contentDescription="@string/next"
                     android:layout_width="wrap_content"
+                    android:layout_alignParentRight="true"
                     android:layout_height="wrap_content"
                     android:src="@drawable/arrow_right"
                     android:id="@+id/nextButton"
+                    android:background="@drawable/rect"
                     android:layout_gravity="right|top" />
-            </FrameLayout>
+            </RelativeLayout>
+        </RelativeLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
             <Button
+                android:layout_margin="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/submit_text"
                 android:id="@+id/submitButton"
-                android:layout_below="@+id/frameLayout"
-                android:layout_alignLeft="@+id/question_codeWebView"
-                android:layout_alignStart="@+id/question_codeWebView" />
-        </RelativeLayout>
-        <com.google.android.gms.ads.AdView
-            android:id="@+id/footnote_adView"
-            ads:adSize="BANNER"
-            ads:adUnitId="@string/footnote_banner_ad_unit"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentBottom="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-        </com.google.android.gms.ads.AdView>
+                android:background="@drawable/rect" />
 
-        <RelativeLayout
-            android:id="@+id/question_page_coverLayout"
-            android:layout_width="1000dp"
-            android:layout_height="1000dp"
-            android:layout_centerInParent="true"
-            android:background="#d3d3d3"
-            android:gravity="center"
-            android:clickable="true">
-            <ProgressBar
+            <com.google.android.gms.ads.AdView
+                android:id="@+id/footnote_adView"
+                ads:adSize="BANNER"
+                ads:adUnitId="@string/footnote_banner_ad_unit"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@android:style/Widget.ProgressBar.Large" />
-        </RelativeLayout>
-    </RelativeLayout>
+                android:layout_height="wrap_content">
+            </com.google.android.gms.ads.AdView>
+        </LinearLayout>
+    </LinearLayout>
 </ScrollView>

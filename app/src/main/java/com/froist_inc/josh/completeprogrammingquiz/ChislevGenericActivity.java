@@ -48,10 +48,8 @@ public abstract class ChislevGenericActivity extends AppCompatActivity
         switch( item.getItemId() ){
             case R.id.action_settings:
                 return true;
-            case R.id.action_updateQuestions:
-                return true;
             default:
-                return super.onOptionsItemSelected(item);
+                return super.onOptionsItemSelected( item );
         }
     }
 }

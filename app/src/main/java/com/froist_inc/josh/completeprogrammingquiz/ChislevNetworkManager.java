@@ -23,10 +23,12 @@ public class ChislevNetworkManager
     {
         URL url;
         HttpsURLConnection urlConnection = null;
+        final int fortyFiveSeconds = 45000;
 
         try {
             url = new URL( address );
             urlConnection = ( HttpsURLConnection ) url.openConnection();
+            urlConnection.setConnectTimeout( fortyFiveSeconds );
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             InputStream in = urlConnection.getInputStream();
 

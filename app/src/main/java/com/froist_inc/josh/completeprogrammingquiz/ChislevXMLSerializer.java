@@ -117,10 +117,20 @@ public class ChislevXMLSerializer
                         } else if( level.equals( name )){
                             newQuestion.setDifficultyLevel( xmlPullParser.nextText().trim() );
                         } else if( options.equals( name ) ){
-                            final String text = xmlPullParser.nextText();
+                            final String VALUE = "value", OPTION = "option";
                             ArrayList<String> elements = new ArrayList<>();
-                            String [] availableOptions = text.split( "\\r?\\n" );
-                            Collections.addAll( elements, availableOptions );
+                            int event = xmlPullParser.next();
+                            String tagName = xmlPullParser.getName();
+
+                            while( event != XmlPullParser.END_DOCUMENT && !name.equals( tagName ) )
+                            {
+                                if( event == XmlPullParser.START_TAG && OPTION.equals( xmlPullParser.getName() ) )
+                                {
+                                    elements.add( xmlPullParser.getAttributeValue( null, VALUE ));
+                                }
+                                event = xmlPullParser.next();
+                                tagName = xmlPullParser.getName();
+                            }
                             newQuestion.setAvailableOptions( elements );
                         }
                     }

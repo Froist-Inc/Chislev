@@ -21,6 +21,7 @@ public class ChislevChooseLevelDialog extends DialogFragment
 {
     public static final String DIFFICULTY_LEVEL = "DIFFICULTY_LEVEL";
     private static final int LEVEL_SIZE = 4; // Beginner, Intermediate, Advanced, Random Level -- in that particular order.
+    public static final String TAG = "ChislevChooseLevelDialog";
 
     @NonNull
     @Override
@@ -28,6 +29,9 @@ public class ChislevChooseLevelDialog extends DialogFragment
     {
         GridView levelGridView = new GridView( getActivity() );
         levelGridView.setId( R.id.levelGridView );
+        levelGridView.setNumColumns( GridView.AUTO_FIT );
+        levelGridView.setStretchMode( GridView.STRETCH_COLUMN_WIDTH );
+
         ArrayList<Integer> dummyList = new ArrayList<>();
         for ( int i = 0; i != LEVEL_SIZE; i++ ) {
             dummyList.add(i);
@@ -56,7 +60,8 @@ public class ChislevChooseLevelDialog extends DialogFragment
         {
             Intent resultIntent = new Intent();
             resultIntent.putExtra( DIFFICULTY_LEVEL, position );
-            getTargetFragment().onActivityResult( ChislevChooseSubjectFragment.LEVEL_REQUEST_CODE, result, resultIntent );
+            getTargetFragment().onActivityResult( ChislevSubjectPresenterFragments.LEVEL_REQUEST_CODE, result,
+                    resultIntent );
         }
     }
 
