@@ -113,9 +113,16 @@ public class ChislevXMLSerializer
                         } else if( hint.equals( name ) ){
                             newQuestion.setHint( xmlPullParser.nextText() );
                         } else if( code.equals( name )){
-                            newQuestion.setCode( xmlPullParser.nextText() );
+							eventType = xmlPullParser.nextToken();
+							while( eventType != XmlPullParser.END_DOCUMENT ){
+								if( eventType == XmlPullParser.CDSECT ){
+		                            newQuestion.setCode( xmlPullParser.getText() );
+									break;
+								}
+								eventType = xmlPullParser.nextToken();
+							}
                         } else if( level.equals( name )){
-                            newQuestion.setDifficultyLevel( xmlPullParser.nextText().trim() );
+                            newQuestion.setDifficultyLevel( xmlPullParser.getAttributeValue( null, "value" ) );
                         } else if( options.equals( name ) ){
                             final String VALUE = "value", OPTION = "option";
                             ArrayList<String> elements = new ArrayList<>();

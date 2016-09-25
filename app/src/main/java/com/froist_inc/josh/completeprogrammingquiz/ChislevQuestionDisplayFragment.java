@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 
 public class ChislevQuestionDisplayFragment extends Fragment
 {
@@ -135,10 +133,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
                 int minutes = ( int ) x % 60;
                 x /= 60;
                 int hours = ( int ) x % 24;
-                x /= 24;
-                int days = ( int ) x;
-                String text = "" + ( days > 0 ? ( days + " day(s), " ) : "" ) +
-                        ( hours > 0 ? ( hours + "h" ) : "" ) +
+                String text = "" + ( hours > 0 ? ( hours + "h" ) : "" ) +
                         ( minutes > 0 ? ( minutes + "m" ) : "" ) +
                         seconds + "s";
                 mTimerTextView.setText( text );
