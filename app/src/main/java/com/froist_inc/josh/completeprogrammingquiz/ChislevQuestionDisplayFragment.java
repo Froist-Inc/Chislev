@@ -1,5 +1,6 @@
 package com.froist_inc.josh.completeprogrammingquiz;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -7,12 +8,16 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import android.widget.ImageButton;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,9 +30,9 @@ import java.util.Map;
 
 public class ChislevQuestionDisplayFragment extends Fragment
 {
+    private static final String TAG = "QuestionDisplayFragment";
+    public static final int HINT_CHECK = 1;
     private static final String EXTRA_INDEX = "EXTRA_INDEX", EXTRA_LEVEL = "EXTRA_LEVEL", EXTRA = "EXTRA_DATA";
-    private CountDownTimer mCountDownTimer;
-
     private final int QUESTION_SIZE = 5;
 
     private ArrayList<ChislevQuestion> mQuestionList;
@@ -35,9 +40,11 @@ public class ChislevQuestionDisplayFragment extends Fragment
     int mSubjectIndex, mLevel;
 
     WebView mCodeView;
-    ImageButton mNextQuestionButton, mPrevQuestionButton;
-    TextView mContributorTextView, mTimerTextView, mQuestionTextView;
+    TextView mContributorTextView, mTimerTextView, mQuestionTextView, mQuestionIndexTextView;
+    RadioGroup mCollectiveOptions;
     RadioButton mFirstOptionRadio, mSecondOptionRadio, mThirdOptionRadio, mFourthOptionRadio;
+    EditText mAnswerText;
+
     View /* coverView = null, */ view = null;
 
     private void UpdateQuestionView( int index )
@@ -46,22 +53,21 @@ public class ChislevQuestionDisplayFragment extends Fragment
         ChislevQuestion currentQuestion = mQuestionList.get( index );
 
         mCodeView.loadData( currentQuestion.getCode(), "text/html", "UTF-8" );
-        if( index == 0 ){
-            mPrevQuestionButton.setEnabled( false );
-        } else if( index == ( mQuestionList.size() - 1 ) ){
-            mNextQuestionButton.setEnabled( false );
-        }
-
+        mCodeView.reload();
         if( currentQuestion.getOwner() == null ){
-            mContributorTextView.setText( getString( R.string.question_contributor, "The C++ Community" ) );
+            mContributorTextView.setText( getString( R.string.question_contributor, "The " +
+                    ChislevSubjectsLaboratory.Get( getActivity() ).GetSubjectItem( mSubjectIndex ).getSubjectName() +
+            " Community" ) );
         } else {
             mContributorTextView.setText( getString( R.string.question_contributor, currentQuestion.getOwner() ));
         }
+        mQuestionIndexTextView.setText( "Question " + ( index + 1 ) + " of " + mQuestionList.size() );
         mQuestionTextView.setText( currentQuestion.getQuestion().trim() );
         mFirstOptionRadio.setText( currentQuestion.getAvailableOptions().get( 0 ));
         mSecondOptionRadio.setText( currentQuestion.getAvailableOptions().get( 1 ));
         mThirdOptionRadio.setText( currentQuestion.getAvailableOptions().get( 2 ));
         mFourthOptionRadio.setText( currentQuestion.getAvailableOptions().get( 3 ));
+        mAnswerText.setText( currentQuestion.getAnswer() != null ? currentQuestion.getAnswer() : "" );
     }
 
     @Nullable
@@ -73,22 +79,46 @@ public class ChislevQuestionDisplayFragment extends Fragment
 //        coverView = view.findViewById( R.id.question_page_coverLayout );
 //        coverView.setVisibility( View.VISIBLE );
 
-        mPrevQuestionButton = ( ImageButton ) view.findViewById( R.id.prevButton );
-        mNextQuestionButton = ( ImageButton ) view.findViewById( R.id.nextButton );
+        Button hintButton = ( Button ) view.findViewById( R.id.hintButton );
+        hintButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick( View v ) {
+                ChislevHintDisplayDialog hintDialog = new ChislevHintDisplayDialog();
+                hintDialog.setTargetFragment( ChislevQuestionDisplayFragment.this, HINT_CHECK );
+                hintDialog.show( getActivity().getSupportFragmentManager(), ChislevHintDisplayDialog.TAG );
+            }
+        });
+        mAnswerText = ( EditText ) view.findViewById( R.id.chosen_option_editText );
+        mAnswerText.addTextChangedListener( new TextWatcher() {
+            @Override
+            public void beforeTextChanged( CharSequence s, int start, int count, int after ) {}
 
-        mPrevQuestionButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onTextChanged( CharSequence s, int start, int before, int count ) {
+                mQuestionList.get( mCurrentQuestionIndex ).setAnswer( s.toString() );
+            }
+
+            @Override
+            public void afterTextChanged( Editable s ) {}
+        });
+
+        mQuestionIndexTextView = ( TextView ) view.findViewById( R.id.questionIndex );
+
+        Button prevQuestionButton = ( Button ) view.findViewById( R.id.prevButton );
+        prevQuestionButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick( View v ) {
                 if( mCurrentQuestionIndex == 0 ) return;
-                mCurrentQuestionIndex = ( mCurrentQuestionIndex - 1 ) % mQuestionList.size();
+                --mCurrentQuestionIndex;
                 UpdateQuestionView( mCurrentQuestionIndex );
             }
         });
-        mNextQuestionButton.setOnClickListener(new View.OnClickListener() {
+        Button nextQuestionButton = ( Button ) view.findViewById( R.id.nextButton );
+        nextQuestionButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick( View v ) {
                 mCurrentQuestionIndex = ( mCurrentQuestionIndex + 1 ) % mQuestionList.size();
-                UpdateQuestionView( mCurrentQuestionIndex );
+				UpdateQuestionView( mCurrentQuestionIndex );
             }
         });
         mCodeView = ( WebView ) view.findViewById( R.id.question_codeWebView );
@@ -96,10 +126,34 @@ public class ChislevQuestionDisplayFragment extends Fragment
         mTimerTextView = ( TextView ) view.findViewById( R.id.timer_textView );
         mContributorTextView = ( TextView ) view.findViewById( R.id.contributor_textView );
         mQuestionTextView = ( TextView ) view.findViewById( R.id.question_textView );
+        mCollectiveOptions = ( RadioGroup ) view.findViewById( R.id.radioGroup );
         mFirstOptionRadio = ( RadioButton ) view.findViewById( R.id.question_option_oneRadioButton );
         mSecondOptionRadio = ( RadioButton ) view.findViewById( R.id.question_option_twoRadioButton );
         mThirdOptionRadio = ( RadioButton ) view.findViewById( R.id.question_option_threeRadioButton );
         mFourthOptionRadio = ( RadioButton ) view.findViewById( R.id.question_option_fourRadioButton );
+
+        mCollectiveOptions.setOnCheckedChangeListener( new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged( RadioGroup group, int checkedId ) {
+                switch( checkedId ){
+                    case R.id.question_option_oneRadioButton:
+                        mQuestionList.get( mCurrentQuestionIndex ).setChosenOption( 0 );
+                        break;
+                    case R.id.question_option_twoRadioButton:
+                        mQuestionList.get( mCurrentQuestionIndex ).setChosenOption( 1 );
+                        break;
+                    case R.id.question_option_threeRadioButton:
+                        mQuestionList.get( mCurrentQuestionIndex ).setChosenOption( 2 );
+                        break;
+                    case R.id.question_option_fourRadioButton:
+                        mQuestionList.get( mCurrentQuestionIndex ).setChosenOption( 3 );
+                        break;
+                    default:
+                        mQuestionList.get( mCurrentQuestionIndex ).setChosenOption( -1 );
+                        break;
+                }
+            }
+        });
         return view;
     }
 
@@ -115,6 +169,23 @@ public class ChislevQuestionDisplayFragment extends Fragment
         new ChislevSubjectProcessingTask().execute();
     }
 
+    @Override
+    public void onActivityResult( int requestCode, int resultCode, Intent data )
+    {
+        super.onActivityResult( requestCode, resultCode, data );
+        if( requestCode == ChislevQuestionDisplayFragment.HINT_CHECK ) {
+            if ( resultCode == Activity.RESULT_OK ) {
+
+                mQuestionList.get( mCurrentQuestionIndex ).setHintUsed();
+            }
+            Fragment hintDialogFragment = getActivity().getSupportFragmentManager()
+                    .findFragmentByTag( ChislevHintDisplayDialog.TAG );
+            if( hintDialogFragment != null ){
+                (( ChislevHintDisplayDialog ) hintDialogFragment ).dismiss();
+            }
+        }
+    }
+
     private void UpdateMainUIView()
     {
         if( mQuestionList == null || mQuestionList.size() < 1 ){
@@ -123,7 +194,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
             return;
         }
         final int anHour = 3600000, oneSecond = 1000;
-        mCountDownTimer = new CountDownTimer( anHour, oneSecond ) {
+        new CountDownTimer( anHour, oneSecond ) {
             @Override
             public void onTick( long millisUntilFinished )
             {
@@ -142,11 +213,17 @@ public class ChislevQuestionDisplayFragment extends Fragment
             @Override
             public void onFinish()
             {
-
+                DoFinalSubmission();
             }
         }.start();
 //        coverView.setVisibility( View.INVISIBLE );
         UpdateQuestionView( mCurrentQuestionIndex );
+    }
+
+    // Todo
+    private void DoFinalSubmission()
+    {
+
     }
 
     // Todo -> save array index and some other housekeeping information
@@ -164,7 +241,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
             boolean notRandom = filterCriteria.compareToIgnoreCase( "Beginner" ) == 0 ||
                     filterCriteria.compareToIgnoreCase( "Intermediate" ) == 0 ||
                     filterCriteria.compareToIgnoreCase( "Advanced" ) == 0;
-            ArrayList<ChislevQuestion> questions = null;
+            ArrayList<ChislevQuestion> questions;
             if( !notRandom ){
                 questions = questionMap.get( filterCriteria );
             } else {

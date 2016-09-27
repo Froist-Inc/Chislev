@@ -105,11 +105,12 @@ public class ChislevXMLSerializer
                     final String name = xmlPullParser.getName();
                     if( element.equals( name ) ){
                         newQuestion = new ChislevQuestion();
+                        newQuestion.setReferenceID( xmlPullParser.getAttributeValue( null, "reference_id" ) );
                     } else if( newQuestion != null ){
                         if( question.equals( name )){
                             newQuestion.setQuestion( xmlPullParser.nextText() );
                         } else if( explanation.equals( name ) ){
-                            newQuestion.setCorrectAnswer( xmlPullParser.nextText() );
+                            newQuestion.setExplanation( xmlPullParser.nextText() );
                         } else if( hint.equals( name ) ){
                             newQuestion.setHint( xmlPullParser.nextText() );
                         } else if( code.equals( name )){

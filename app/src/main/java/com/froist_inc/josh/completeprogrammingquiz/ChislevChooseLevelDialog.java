@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -28,6 +29,7 @@ public class ChislevChooseLevelDialog extends DialogFragment
     public Dialog onCreateDialog( Bundle savedInstanceState )
     {
         GridView levelGridView = new GridView( getActivity() );
+        levelGridView.setGravity( Gravity.CENTER );
         levelGridView.setId( R.id.levelGridView );
         levelGridView.setNumColumns( GridView.AUTO_FIT );
         levelGridView.setStretchMode( GridView.STRETCH_COLUMN_WIDTH );

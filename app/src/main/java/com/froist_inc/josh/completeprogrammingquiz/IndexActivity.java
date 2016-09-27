@@ -72,10 +72,7 @@ public class IndexActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected( MenuItem item ) {
-        if( mDrawerToggle.onOptionsItemSelected( item )){
-            return true;
-        }
-        return super.onOptionsItemSelected( item );
+        return mDrawerToggle.onOptionsItemSelected( item ) || super.onOptionsItemSelected( item );
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener
@@ -104,7 +101,6 @@ public class IndexActivity extends AppCompatActivity
                 break;
             // Todo
             case 1: default:
-                fragmentToShow = null;
                 break;
         }
         getSupportFragmentManager().beginTransaction().replace( R.id.drawer_mainLayout, fragmentToShow ).commit();

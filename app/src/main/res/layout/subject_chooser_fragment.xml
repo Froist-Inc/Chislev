@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:background="@android:color/white"
+    android:layout_marginTop="20dp"
     android:layout_centerInParent="true"
     android:layout_height="match_parent">
     <LinearLayout
@@ -14,16 +15,16 @@
             android:layout_marginTop="15dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Fetch questions online"
+            android:text="@string/fetch_questions"
             android:id="@+id/go_onlineButton"
             />
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/box"
-            android:id="@+id/imageView" />
+            android:src="@drawable/box" />
     </LinearLayout>
     <LinearLayout
+        android:layout_marginTop="20dp"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -31,7 +32,6 @@
             android:numColumns="auto_fit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:id="@+id/subject_choose_gridView"
             android:gravity="center"
             android:stretchMode="columnWidth"
@@ -45,7 +45,6 @@
         android:background="@android:color/white"
         android:clickable="true">
         <TextView
-            android:id="@+id/subject_chooser_loadingTextView"
             android:text="@string/index_activity_loading"
             android:layout_width="wrap_content"
             android:layout_height="50dp"

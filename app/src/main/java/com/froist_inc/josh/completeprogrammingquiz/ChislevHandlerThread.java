@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class ChislevHandlerThread extends HandlerThread
 {
@@ -64,7 +63,7 @@ public class ChislevHandlerThread extends HandlerThread
         };
     }
 
-    private void HandleMessage( final ChislevSubjectInformation subject )
+    synchronized private void HandleMessage( final ChislevSubjectInformation subject )
     {
         try {
             boolean subjectDirectoryExists = mFileManager.FileExists( subject.getSubjectCode() );
@@ -94,19 +93,13 @@ public class ChislevHandlerThread extends HandlerThread
                 }
             }
             subject.setIsAllSet( true );
-            Object lock = new Object();
-            synchronized( lock ) {
-                mMainUIHandler.post( new Runnable() {
-                    @Override
-                    public void run() {
-                        mData.remove( subject );
-                        Log.d( TAG, "Handling message." );
-                        mListener.OnSubjectCodeDataObtained( subject );
-                    }
-                });
-                lock.notifyAll();
-            }
-            Log.d( TAG, "Outside" );
+            mMainUIHandler.post( new Runnable() {
+                @Override
+                public void run() {
+                    mData.remove( subject );
+                    mListener.OnSubjectCodeDataObtained( subject );
+                }
+            });
         } catch ( IOException exception ){
             Log.d( TAG, exception.getLocalizedMessage(), exception );
         } finally {

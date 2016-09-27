@@ -4,28 +4,41 @@ import java.util.ArrayList;
 
 public class ChislevQuestion
 {
+    private String mExplanation;
+    private String mHint;
     private String mOwner;
     private String mQuestion;
-    private String mCode;
     private ArrayList<String> mAvailableOptions;
-    private String mHint;
-    private String mCorrectAnswer;
+    private String mCode;
     private String mDifficultyLevel;
+    private String mReferenceID;
 
-    boolean mIsQuestionAnswered = false;
-    int mAssociatedScore = 0;
+    private int mChosenOption;
+    private String mAnswer;
+    private boolean mHintUsed = false;
+
+    public void setHintUsed()
+    {
+        mHintUsed = true;
+    }
+
+    public int getChosenOption() {
+        return mChosenOption;
+    }
+
+    public void setChosenOption( int mChosenOption ) {
+        this.mChosenOption = mChosenOption;
+    }
+
+    public String getAnswer() {
+        return mAnswer;
+    }
+
+    public void setAnswer(String mAnswer) {
+        this.mAnswer = mAnswer;
+    }
 
     public ChislevQuestion() {}
-
-    public boolean isQuestionAnswered()
-    {
-        return mIsQuestionAnswered;
-    }
-
-    public void setIsQuestionAnswered( boolean questionAnswered )
-    {
-        mIsQuestionAnswered = questionAnswered;
-    }
 
     public String getDifficultyLevel() {
         return mDifficultyLevel;
@@ -75,11 +88,19 @@ public class ChislevQuestion
         this.mHint = mHint;
     }
 
-    public String getCorrectAnswer() {
-        return mCorrectAnswer;
+    public String getExplanation() {
+        return mExplanation;
     }
 
-    public void setCorrectAnswer( String mCorrectAnswer ) {
-        this.mCorrectAnswer = mCorrectAnswer;
+    public void setExplanation( final String explanation ) {
+        mExplanation = explanation;
+    }
+
+    public String getReferenceID() {
+        return mReferenceID;
+    }
+
+    public void setReferenceID( String referenceID ) {
+        this.mReferenceID = referenceID;
     }
 }
