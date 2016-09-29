@@ -8,22 +8,18 @@
     <string name="question_text">Question</string>
     <string name="hint">Hint</string>
     <string name="show_hint_confirmation">
-        Are you sure you want to see the hint? \n
-        Showing it deducts half the mark for the question.
+        Are you sure you want to see the hint? 1/2 mark is awarded.
     </string>
-    <string name="answerHint">Input text here if options demands it.</string>
+    <string name="answerHint">Input text here</string>
     <string name="available_subjects">Available Subjects</string>
-    <string name="prev">Previous question</string>
-    <string name="next">Next question</string>
-    <string name="submit_text">Final submission</string>
+    <string name="next">Next</string>
+    <string name="submit_text">Finish</string>
     <string name="contributor_text">Contributor</string>
     <string name="timer_display">Timer display</string>
     <string name="menu_item">Actions</string>
     <string name="difficulty_level_title"> Difficulty level</string>
-    <string-array name="index_menu_overlay_item">
-        <item> Take a Quiz </item>
-        <item>Scores</item>
-        <item>Contribute new Questions</item>
-        <item>Attributes</item>
-    </string-array>
+    <string name="take_quiz"> Take a Quiz </string>
+    <string name="scores">Scores</string>
+    <string name="contribute">Contribute new Questions</string>
+    <string name="attributes">Special Thanks</string>
 </resources>

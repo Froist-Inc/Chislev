@@ -11,9 +11,9 @@ import android.view.MenuItem;
 
 public abstract class ChislevGenericActivity extends AppCompatActivity
 {
-    public abstract Fragment GetFragment();
-    public abstract int GetLayoutID();
-    public abstract int GetContainerID();
+    protected abstract Fragment GetFragment();
+    protected abstract int GetLayoutID();
+    protected abstract int GetContainerID();
 
     @Override
     protected void onCreate( @Nullable Bundle savedInstanceState )

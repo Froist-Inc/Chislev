@@ -2,7 +2,7 @@ package com.froist_inc.josh.completeprogrammingquiz;
 
 import java.util.ArrayList;
 
-public class ChislevQuestion
+class ChislevQuestion
 {
     private String mExplanation;
     private String mHint;
@@ -102,5 +102,32 @@ public class ChislevQuestion
 
     public void setReferenceID( String referenceID ) {
         this.mReferenceID = referenceID;
+    }
+
+
+    public static class ChislevSolutionFormat
+    {
+        private final long mReferenceId;
+        private final long mCorrectOption;
+        private final String mCorrectText;
+
+        ChislevSolutionFormat( final long referenceId, final long correctOption, final String correctText )
+        {
+            mReferenceId = referenceId;
+            mCorrectOption = correctOption;
+            mCorrectText = correctText;
+        }
+
+        public long getReferenceId() {
+            return mReferenceId;
+        }
+
+        public long getCorrectOption() {
+            return mCorrectOption;
+        }
+
+        public String getCorrectText() {
+            return mCorrectText;
+        }
     }
 }

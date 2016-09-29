@@ -2,13 +2,17 @@ package com.froist_inc.josh.completeprogrammingquiz;
 
 public class ChislevSubjectInformation
 {
+    public static final String SOLUTION_FILENAME = "solution.db";
+    public static final String ICON_FILENAME = "icon.png";
+    public static final String CHECKSUM_FILENAME = "detail.xml";
+
     private String mSubjectName = null;
     private String mSubjectCode = null;
     private String mSubjectDataUrl = null;
-    private String mSubjectAnswerUrl = null;
     private String mSubjectFilename = null;
-    private String mSubjectUpdateFilename = null;
+    private String mSubjectSolutionDBUrl = null;
     private String mSubjectIconUrl = null;
+    private String mSubjectDetailsCheckSums = null;
 
     private boolean mIsAllSet = false;
     private String mIconFilename = null;
@@ -18,20 +22,19 @@ public class ChislevSubjectInformation
      * @param code name of the root directory containing the necessary information regarding
      *             the subject. e.g. for C++, code could be cpp.
      * @param dataUrl name of the URL containing the resource for `name`
-     * @param answerUrl url leading to the answer's database online
+     * @param solutionDbUrl url leading to the solution's database online
      * @param filename local filename to save the resource file of the subject
-     * @param updateFilename during an update, the `filename` resource file might change, this signifies
-     *                       the new resource file to use in replacement of `filename`
+     * @param checksum filename to the location of the checksums
      */
-    public ChislevSubjectInformation( String name, String code, String dataUrl, String answerUrl,
-                                      String filename, String updateFilename )
+    public ChislevSubjectInformation( String name, String code, String dataUrl, String filename,
+                                      String solutionDbUrl, String checksum )
     {
         mSubjectName = name;
         mSubjectCode = code;
         mSubjectDataUrl = dataUrl;
-        mSubjectAnswerUrl = answerUrl;
         mSubjectFilename = filename;
-        mSubjectUpdateFilename = updateFilename;
+        mSubjectSolutionDBUrl = solutionDbUrl;
+        mSubjectDetailsCheckSums = checksum;
     }
 
     public String getSubjectName() {
@@ -50,8 +53,8 @@ public class ChislevSubjectInformation
         return mSubjectFilename;
     }
 
-    public String getSubjectAnswerUrl() {
-        return mSubjectAnswerUrl;
+    public String getSubjectSolutionDBUrl() {
+        return mSubjectSolutionDBUrl;
     }
 
     public String getSubjectIconUrl() {
@@ -66,11 +69,13 @@ public class ChislevSubjectInformation
         }
     }
 
+    public String getSubjectDetailsCheckSums() {
+        return mSubjectDetailsCheckSums;
+    }
     public String getIconFilename()
     {
         return mIconFilename;
     }
-
     public void setIsAllSet(boolean isSet )
     {
         mIsAllSet = isSet;

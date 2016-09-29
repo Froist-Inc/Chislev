@@ -11,15 +11,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class IndexActivity extends AppCompatActivity
 {
-    private CharSequence mDrawerTitle;
-    private CharSequence mTitle;
-    private String[] mIndexTitles;
     private DrawerLayout mDrawLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -29,13 +29,10 @@ public class IndexActivity extends AppCompatActivity
     {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_index );
-        mTitle = mDrawerTitle = getTitle();
-
-        mIndexTitles = getResources().getStringArray( R.array.index_menu_overlay_item );
         mDrawLayout = ( DrawerLayout ) findViewById( R.id.drawer_layout );
         mDrawerList = ( ListView ) findViewById( R.id.drawer_listView );
 
-        mDrawerList.setAdapter( new ArrayAdapter<>( this, R.layout.drawer_list_layout, mIndexTitles ));
+        mDrawerList.setAdapter( new DrawerInternalLayoutAdapter() );
         mDrawerList.setOnItemClickListener( new DrawerItemClickListener() );
 
         Toolbar toolbar = ( Toolbar) findViewById( R.id.toolbar );
@@ -83,6 +80,39 @@ public class IndexActivity extends AppCompatActivity
         }
     }
 
+    private class DrawerInternalLayoutAdapter extends ArrayAdapter<String>
+    {
+        final int[] mItemCaptionList = new int[]{ R.string.take_quiz, R.string.scores, R.string.contribute, R.string.attributes };
+        private final int ELEMENT_COUNT = mItemCaptionList.length;
+
+        DrawerInternalLayoutAdapter()
+        {
+            super( IndexActivity.this, 0 );
+        }
+
+        @Override
+        public int getCount() {
+            return ELEMENT_COUNT;
+        }
+
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent ) {
+            if( convertView == null ){
+                convertView = getLayoutInflater().inflate( R.layout.drawer_internal_fragment, parent, false );
+            }
+            TextView textView = ( TextView ) convertView.findViewById( R.id.internal_textView );
+            textView.setText( getString( mItemCaptionList[ position ]));
+            if( position == 0 ){
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams( LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT );
+                params.setMargins( 5, 30, 0, 5 );
+                textView.setLayoutParams( params );
+            }
+
+            return convertView;
+        }
+    }
+
     @Override
     public boolean onPrepareOptionsMenu( Menu menu )
     {
@@ -115,7 +145,7 @@ public class IndexActivity extends AppCompatActivity
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig)
+    public void onConfigurationChanged( Configuration newConfig )
     {
         super.onConfigurationChanged( newConfig );
         mDrawerToggle.onConfigurationChanged( newConfig );

@@ -6,6 +6,7 @@
     xmlns:ads="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
+        android:background="@android:color/white"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -96,6 +97,7 @@
                     android:text="@string/app_name" />
 
                 <EditText
+                    android:drawableLeft="@android:drawable/ic_menu_edit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/chosen_option_editText"
@@ -120,9 +122,9 @@
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/prev"
-                    android:id="@+id/prevButton"
-                    android:contentDescription="@string/prev"
+                    android:text="@string/hint"
+                    android:id="@+id/hintButton"
+                    android:contentDescription="@string/hint"
                     android:layout_gravity="left|top" />
                 <Button
                     android:contentDescription="@string/next"
@@ -145,22 +147,5 @@
                 android:layout_alignRight="@+id/question_textView"
                 android:layout_alignEnd="@+id/question_textView" />
         </RelativeLayout>
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center">
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/hint"
-                android:id="@+id/hintButton" />
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/submit_text" />
-        </LinearLayout>
     </LinearLayout>
 </ScrollView>

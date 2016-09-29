@@ -14,10 +14,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChislevXMLSerializer
+class ChislevXMLSerializer
 {
-    private Context mContext;
-    public static final String SUBJECT = "subject";
+    private final Context mContext;
+    private static final String SUBJECT = "subject";
 
     public ChislevXMLSerializer( Context context )
     {
@@ -57,11 +57,11 @@ public class ChislevXMLSerializer
                         subjectCode = xmlPullParser.getAttributeValue( null, "code" ),
                         subjectUrl = xmlPullParser.getAttributeValue( null, "location" ),
                         subjectFilename = xmlPullParser.getAttributeValue( null, "filename" ),
-                        subjectUpdatedFilename = xmlPullParser.getAttributeValue( null, "new_filename" ),
-                        subjectAnswerUrl = xmlPullParser.getAttributeValue( null, "answer" ),
+                        subjectChecksumFilename = xmlPullParser.getAttributeValue( null, "detail" ),
+                        subjectSolutionDB = xmlPullParser.getAttributeValue( null, "solution" ),
                         subjectIconUrl = xmlPullParser.getAttributeValue( null, "icon" );
                 ChislevSubjectInformation subjectInformation = new ChislevSubjectInformation( subjectName,
-                        subjectCode, subjectUrl, subjectAnswerUrl, subjectFilename, subjectUpdatedFilename );
+                        subjectCode, subjectUrl, subjectFilename, subjectSolutionDB, subjectChecksumFilename );
                 subjectInformation.setSubjectIconUrl( subjectIconUrl );
 
                 informationList.add( subjectInformation );
@@ -74,7 +74,7 @@ public class ChislevXMLSerializer
             throws IOException, XmlPullParserException
     {
         ChislevFileManager fileManager = new ChislevFileManager( mContext );
-        if( !fileManager.FileExists( filename, parentDirectory, false ) ){
+        if( !fileManager.FileExists( filename, parentDirectory ) ){
             throw new IOException( "File does not exist." );
         }
         File parentDirectoryFile = new File( mContext.getFilesDir(), parentDirectory );
@@ -85,7 +85,7 @@ public class ChislevXMLSerializer
         return ParseQuestionData( xmlPullParser );
     }
 
-    Map<String, ArrayList<ChislevQuestion>> ParseQuestionData( XmlPullParser xmlPullParser )
+    private Map<String, ArrayList<ChislevQuestion>> ParseQuestionData(XmlPullParser xmlPullParser)
             throws IOException, XmlPullParserException
     {
         Map<String, ArrayList<ChislevQuestion>> questionMap = Collections.synchronizedMap( new HashMap<String,

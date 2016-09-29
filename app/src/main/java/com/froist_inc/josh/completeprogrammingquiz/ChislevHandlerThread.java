@@ -12,25 +12,23 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChislevHandlerThread extends HandlerThread
+class ChislevHandlerThread extends HandlerThread
 {
     private Handler mDefaultHandler;
-    private Handler mMainUIHandler;
-    Listener mListener;
-    ChislevFileManager mFileManager;
-    ChislevNetworkManager mNetworkManager;
-    Context mContext;
+    private final Handler mMainUIHandler;
+    private Listener mListener;
+    private final ChislevFileManager mFileManager;
+    private final ChislevNetworkManager mNetworkManager;
+    private final Context mContext;
 
     public interface Listener {
         void OnSubjectCodeDataObtained( ChislevSubjectInformation subjectInformation );
     }
 
-    public static final String TAG = "ChislevHandlerThread";
-    private static final String ANSWERS_FILENAME = "answer.sqlite";
-    private static final String ICON_FILENAME = "icon.png";
-    static final int DATA_INITIALIZE = 0;
+    private static final String TAG = "ChislevHandlerThread";
+    private static final int DATA_INITIALIZE = 0;
 
-    Map<ChislevSubjectInformation, String> mData =
+    private final Map<ChislevSubjectInformation, String> mData =
             Collections.synchronizedMap( new HashMap< ChislevSubjectInformation, String>() );
 
     public ChislevHandlerThread( Context context, Handler mainUIHandler )
@@ -63,35 +61,18 @@ public class ChislevHandlerThread extends HandlerThread
         };
     }
 
-    synchronized private void HandleMessage( final ChislevSubjectInformation subject )
+    private void HandleMessage( final ChislevSubjectInformation subject )
     {
         try {
             boolean subjectDirectoryExists = mFileManager.FileExists( subject.getSubjectCode() );
             if( !subjectDirectoryExists ){
                 mFileManager.CreateDirectory( subject.getSubjectCode() );
             }
-            boolean subjectQuestionExists = mFileManager.FileExists( subject.getSubjectFilename(),
-                    subject.getSubjectCode(), false );
-            if( !subjectQuestionExists ){
-                byte[] questions = mNetworkManager.GetData( subject.getSubjectDataUrl() );
-                mFileManager.SaveDataToFile( questions, subject.getSubjectFilename(), subject.getSubjectCode() );
-            }
+            GrabData( subject.getSubjectDataUrl(), subject.getSubjectCode(), subject.getSubjectFilename() );
+            GrabData( subject.getSubjectSolutionDBUrl(), subject.getSubjectCode(), ChislevSubjectInformation.SOLUTION_FILENAME );
+            GrabData( subject.getSubjectDetailsCheckSums(), subject.getSubjectCode(), ChislevSubjectInformation.CHECKSUM_FILENAME );
+            GrabData( subject.getSubjectIconUrl(), subject.getSubjectCode(), ChislevSubjectInformation.ICON_FILENAME );
 
-            if( subject.getSubjectAnswerUrl() != null ){
-                boolean answersDatabaseExists = mFileManager.FileExists( ANSWERS_FILENAME, subject.getSubjectCode(), false );
-                if( !answersDatabaseExists ){
-                    byte[] answersData = mNetworkManager.GetData( subject.getSubjectAnswerUrl() );
-                    mFileManager.SaveDataToFile( answersData, ANSWERS_FILENAME, subject.getSubjectCode() );
-                }
-            }
-
-            if( subject.getSubjectIconUrl() != null ){
-                boolean iconExists = mFileManager.FileExists( ICON_FILENAME, subject.getSubjectCode(), false );
-                if( !iconExists ){
-                    byte[] iconData = mNetworkManager.GetData( subject.getSubjectIconUrl() );
-                    mFileManager.SaveDataToFile( iconData, ICON_FILENAME, subject.getSubjectCode() );
-                }
-            }
             subject.setIsAllSet( true );
             mMainUIHandler.post( new Runnable() {
                 @Override
@@ -107,9 +88,20 @@ public class ChislevHandlerThread extends HandlerThread
         }
     }
 
-    public void Prepare( ChislevSubjectInformation subjectInformation )
+    public void Prepare( final ChislevSubjectInformation subjectInformation )
     {
         mData.put( subjectInformation, subjectInformation.getSubjectName() );
         mDefaultHandler.obtainMessage( ChislevHandlerThread.DATA_INITIALIZE, subjectInformation ).sendToTarget();
+    }
+
+    private void GrabData( final String url, final String directory, final String filename )
+            throws IOException
+    {
+        if( url != null ){
+            if( !mFileManager.FileExists( filename, directory ) ){
+                byte[] data = mNetworkManager.GetData( url );
+                mFileManager.SaveDataToFile( data, filename, directory );
+            }
+        }
     }
 }

@@ -9,9 +9,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class ChislevFileManager
+@SuppressWarnings("ALL")
+class ChislevFileManager
 {
-    private Context mContext;
+    private final Context mContext;
     private static final String TAG = "ChislevFileManager";
 
     ChislevFileManager( Context context )
@@ -24,15 +25,10 @@ public class ChislevFileManager
         return new File( mContext.getFilesDir(), filename ).exists();
     }
 
-    boolean FileExists( String filename, String parentDirectory, boolean createIfNotExists )
+    boolean FileExists( String filename, String parentDirectory )
             throws IOException
     {
         File parentDirectoryFile = new File( mContext.getFilesDir(), parentDirectory );
-        if( !parentDirectoryFile.exists() ){
-            if( createIfNotExists ){
-                if( !CreateDirectory( parentDirectory ) ) return false;
-            }
-        }
         File file = new File( parentDirectoryFile.getCanonicalPath(), filename );
         return file.exists();
     }

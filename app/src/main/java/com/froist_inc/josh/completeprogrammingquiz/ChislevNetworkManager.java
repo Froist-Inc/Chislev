@@ -9,9 +9,9 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class ChislevNetworkManager
+class ChislevNetworkManager
 {
-    Context mContext;
+    private final Context mContext;
     static final String TAG = "ChislevNetworkManager";
 
     ChislevNetworkManager( Context context )

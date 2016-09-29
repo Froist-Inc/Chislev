@@ -8,7 +8,7 @@ public class ChislevSubjectsLaboratory
 {
     private static ChislevSubjectsLaboratory subjectsLaboratoryInstance;
     private ArrayList<ChislevSubjectInformation> mItems;
-    private Context mContext;
+    private final Context mContext;
 
     public static ChislevSubjectsLaboratory Get( Context context )
     {

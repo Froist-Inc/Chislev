@@ -31,9 +31,9 @@ public class ChislevSubjectPresenterFragments extends Fragment
     private static final String CONFIG_FILENAME = "config.xml";
     private static final String CONFIG_URL = "https://raw.githubusercontent.com/Froist/Chislev/master/Data/config.xml";
 
-    ChislevFileManager mFileManager = null;
-    private View mEmptyView, mViewLoading;
-    Button mGoOnlineButton;
+    private ChislevFileManager mFileManager = null;
+    private View mViewLoading;
+    private Button mGoOnlineButton;
     private GridView mGridView;
     private ChislevHandlerThread mHandlerThread = null;
 
@@ -90,7 +90,7 @@ public class ChislevSubjectPresenterFragments extends Fragment
         View layoutView = inflater.inflate( R.layout.subject_chooser_fragment, container, false );
 
         mGridView = ( GridView ) layoutView.findViewById( R.id.subject_choose_gridView );
-        mEmptyView = layoutView.findViewById( R.id.empty );
+        View mEmptyView = layoutView.findViewById( R.id.empty );
         mGridView.setEmptyView( mEmptyView );
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -145,7 +145,7 @@ public class ChislevSubjectPresenterFragments extends Fragment
 
     private class ChislevSubjectAdapter extends ArrayAdapter<ChislevSubjectInformation>
     {
-        ArrayList<ChislevSubjectInformation> mList;
+        final ArrayList<ChislevSubjectInformation> mList;
         ChislevSubjectAdapter( ArrayList<ChislevSubjectInformation> informationList )
         {
             super( getActivity(), 0, informationList );
