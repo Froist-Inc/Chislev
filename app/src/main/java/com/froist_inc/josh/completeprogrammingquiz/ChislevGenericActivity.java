@@ -21,9 +21,6 @@ public abstract class ChislevGenericActivity extends AppCompatActivity
         super.onCreate( savedInstanceState );
         setContentView( GetLayoutID() );
 
-        Toolbar toolbar = ( Toolbar ) findViewById( R.id.toolbar );
-        setSupportActionBar( toolbar );
-
         final int containerID = GetContainerID();
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentById( containerID );
@@ -31,25 +28,6 @@ public abstract class ChislevGenericActivity extends AppCompatActivity
         if( fragment == null ){
             fragment = GetFragment();
             fragmentManager.beginTransaction().add( containerID, fragment ).commit();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu( Menu menu )
-    {
-        getMenuInflater().inflate( R.menu.menu_index, menu );
-        return true;
-    }
-
-    // Todo
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch( item.getItemId() ){
-            case R.id.action_settings:
-                return true;
-            default:
-                return super.onOptionsItemSelected( item );
         }
     }
 }

@@ -24,8 +24,11 @@ public class IndexActivity extends AppCompatActivity
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
 
+    private static final String CURRENT_INDEX = "IndexCode";
+    int mPageIndex;
+
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState)
+    protected void onCreate( @Nullable Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_index );
@@ -56,9 +59,15 @@ public class IndexActivity extends AppCompatActivity
             }
         };
         mDrawLayout.addDrawerListener( mDrawerToggle );
-        if( savedInstanceState == null ){
-            selectItem( 0 );
-        }
+
+        mPageIndex = savedInstanceState == null ? 0 : savedInstanceState.getInt( CURRENT_INDEX );
+        selectItem( mPageIndex );
+    }
+
+    @Override
+    protected void onSaveInstanceState( Bundle outState ) {
+        outState.putInt( CURRENT_INDEX, mPageIndex );
+        super.onSaveInstanceState( outState );
     }
 
     @Override
@@ -125,6 +134,7 @@ public class IndexActivity extends AppCompatActivity
     private void selectItem( int position )
     {
         Fragment fragmentToShow = null;
+        mPageIndex = position;
         switch ( position ){
             case 0: // lists of quiz
                 fragmentToShow = new ChislevSubjectPresenterFragments();

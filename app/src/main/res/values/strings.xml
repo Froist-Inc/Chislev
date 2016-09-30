@@ -6,10 +6,10 @@
     <string name="question_contributor">Question contributed by: %1$s </string>
     <string name="footnote_banner_ad_unit"> ca-app-pub-6531251854739248/5903891327 </string>
     <string name="question_text">Question</string>
+    <string name="forfeit_test">Forfeit</string>
     <string name="hint">Hint</string>
-    <string name="show_hint_confirmation">
-        Are you sure you want to see the hint? 1/2 mark is awarded.
-    </string>
+    <string name="question_page_title">%1$s( %2$s )</string>
+    <string name="show_hint_confirmation">Are you sure you want to see the hint? 1/2 mark is awarded.</string>
     <string name="answerHint">Input text here</string>
     <string name="available_subjects">Available Subjects</string>
     <string name="next">Next</string>

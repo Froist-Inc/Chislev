@@ -34,24 +34,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 
-public class ChislevQuestionDisplayFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
+public class ChislevQuestionDisplayFragment extends Fragment
 {
     private static final String TAG = "QuestionDisplayFragment";
     public static final int HINT_CHECK = 1;
     private static final String EXTRA_INDEX = "EXTRA_INDEX", EXTRA_LEVEL = "EXTRA_LEVEL", EXTRA = "EXTRA_DATA";
-    private final int QUESTION_SIZE = 5;
 
-    private ArrayList<ChislevQuestion> mQuestionList;
     private int mCurrentQuestionIndex = 0;
     private int mSubjectIndex;
     private int mLevel;
+    private Thread solutionsLoaderThread;
 
     private WebView mCodeView;
     private TextView mContributorTextView;
     private TextView mTimerTextView;
     private TextView mQuestionTextView;
     private TextView mQuestionIndexTextView;
-    private RadioGroup mCollectiveOptions;
+
     private RadioButton mFirstOptionRadio;
     private RadioButton mSecondOptionRadio;
     private RadioButton mThirdOptionRadio;
@@ -62,8 +61,8 @@ public class ChislevQuestionDisplayFragment extends Fragment implements LoaderMa
 
     private void UpdateQuestionView( int index )
     {
-        if( view == null || mQuestionList == null ) return;
-        ChislevQuestion currentQuestion = mQuestionList.get( index );
+        if( view == null || ChislevQuestionDisplayActivity.GetQuestionList() == null ) return;
+        ChislevQuestion currentQuestion = ChislevQuestionDisplayActivity.GetQuestionList().get( index );
 
         mCodeView.loadData( currentQuestion.getCode(), "text/html", "UTF-8" );
         mCodeView.reload();
@@ -74,7 +73,8 @@ public class ChislevQuestionDisplayFragment extends Fragment implements LoaderMa
         } else {
             mContributorTextView.setText( getString( R.string.question_contributor, currentQuestion.getOwner() ));
         }
-        mQuestionIndexTextView.setText( "Question " + ( index + 1 ) + " of " + mQuestionList.size() );
+        mQuestionIndexTextView.setText( "Question " + ( index + 1 ) + " of " +
+                ChislevQuestionDisplayActivity.GetQuestionList().size() );
         mQuestionTextView.setText( currentQuestion.getQuestion().trim() );
         mFirstOptionRadio.setText( currentQuestion.getAvailableOptions().get( 0 ));
         mSecondOptionRadio.setText( currentQuestion.getAvailableOptions().get( 1 ));
@@ -108,7 +108,7 @@ public class ChislevQuestionDisplayFragment extends Fragment implements LoaderMa
 
             @Override
             public void onTextChanged( CharSequence s, int start, int before, int count ) {
-                mQuestionList.get( mCurrentQuestionIndex ).setAnswer( s.toString() );
+                ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setAnswer( s.toString() );
             }
 
             @Override
@@ -121,12 +121,12 @@ public class ChislevQuestionDisplayFragment extends Fragment implements LoaderMa
         nextQuestionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick( View v ) {
-                if( mCurrentQuestionIndex == mQuestionList.size() - 1 ){
+                if( mCurrentQuestionIndex == ChislevQuestionDisplayActivity.GetQuestionList().size() - 1 ){
                     DoFinalSubmission();
                     return;
                 }
                 ++mCurrentQuestionIndex;
-                if( mCurrentQuestionIndex == mQuestionList.size() - 1 ){
+                if( mCurrentQuestionIndex == ChislevQuestionDisplayActivity.GetQuestionList().size() - 1 ){
                     nextQuestionButton.setText( getString( R.string.submit_text ));
                 }
                 UpdateQuestionView( mCurrentQuestionIndex );
@@ -137,30 +137,30 @@ public class ChislevQuestionDisplayFragment extends Fragment implements LoaderMa
         mTimerTextView = ( TextView ) view.findViewById( R.id.timer_textView );
         mContributorTextView = ( TextView ) view.findViewById( R.id.contributor_textView );
         mQuestionTextView = ( TextView ) view.findViewById( R.id.question_textView );
-        mCollectiveOptions = ( RadioGroup ) view.findViewById( R.id.radioGroup );
         mFirstOptionRadio = ( RadioButton ) view.findViewById( R.id.question_option_oneRadioButton );
         mSecondOptionRadio = ( RadioButton ) view.findViewById( R.id.question_option_twoRadioButton );
         mThirdOptionRadio = ( RadioButton ) view.findViewById( R.id.question_option_threeRadioButton );
         mFourthOptionRadio = ( RadioButton ) view.findViewById( R.id.question_option_fourRadioButton );
 
-        mCollectiveOptions.setOnCheckedChangeListener( new RadioGroup.OnCheckedChangeListener() {
+        RadioGroup collectiveOptions = ( RadioGroup ) view.findViewById( R.id.radioGroup );
+        collectiveOptions.setOnCheckedChangeListener( new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged( RadioGroup group, int checkedId ) {
                 switch( checkedId ){
                     case R.id.question_option_oneRadioButton:
-                        mQuestionList.get( mCurrentQuestionIndex ).setChosenOption( 0 );
+                        ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setChosenOption( 0 );
                         break;
                     case R.id.question_option_twoRadioButton:
-                        mQuestionList.get( mCurrentQuestionIndex ).setChosenOption( 1 );
+                        ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setChosenOption( 1 );
                         break;
                     case R.id.question_option_threeRadioButton:
-                        mQuestionList.get( mCurrentQuestionIndex ).setChosenOption( 2 );
+                        ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setChosenOption( 2 );
                         break;
                     case R.id.question_option_fourRadioButton:
-                        mQuestionList.get( mCurrentQuestionIndex ).setChosenOption( 3 );
+                        ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setChosenOption( 3 );
                         break;
                     default:
-                        mQuestionList.get( mCurrentQuestionIndex ).setChosenOption( -1 );
+                        ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setChosenOption( -1 );
                         break;
                 }
             }
@@ -192,8 +192,7 @@ public class ChislevQuestionDisplayFragment extends Fragment implements LoaderMa
         super.onActivityResult( requestCode, resultCode, data );
         if( requestCode == ChislevQuestionDisplayFragment.HINT_CHECK ) {
             if ( resultCode == Activity.RESULT_OK ) {
-
-                mQuestionList.get( mCurrentQuestionIndex ).setHintUsed();
+                ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setHintUsed();
             }
             Fragment hintDialogFragment = getActivity().getSupportFragmentManager()
                     .findFragmentByTag( ChislevHintDisplayDialog.TAG );
@@ -205,14 +204,16 @@ public class ChislevQuestionDisplayFragment extends Fragment implements LoaderMa
 
     private void UpdateMainUIView()
     {
-        if( mQuestionList == null || mQuestionList.size() < 1 ){
+        final ArrayList<ChislevQuestion> questionList = ChislevQuestionDisplayActivity.GetQuestionList();
+        if( questionList == null || questionList.size() < 1 ){
             Toast.makeText( getActivity(), "Could not process questions, please update app.", Toast.LENGTH_LONG ).show();
             getActivity().finish();
             return;
         }
 
         // at least we have one or more questions presented to the user, now let's secretly get their solutions ready
-        getLoaderManager().initLoader( 0, null, ChislevQuestionDisplayFragment.this );
+        LoadAnswersWithLoader( getLoaderManager() );
+//        getActivity().setTitle( getString( R.string.question_page_title,  ));
 
         final int anHour = 3600000, oneSecond = 1000;
         new CountDownTimer( anHour, oneSecond ) {
@@ -241,10 +242,35 @@ public class ChislevQuestionDisplayFragment extends Fragment implements LoaderMa
         UpdateQuestionView( mCurrentQuestionIndex );
     }
 
+    private void LoadAnswersWithLoader( final LoaderManager loaderManager )
+    {
+         solutionsLoaderThread = new Thread( new Runnable() {
+            @Override
+            public void run() {
+                loaderManager.initLoader( 0, null, new LoaderCallbacks() );
+            }
+        });
+        solutionsLoaderThread.start();
+    }
+
     // Todo
     private void DoFinalSubmission()
     {
 
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        try {
+            solutionsLoaderThread.interrupt();
+            solutionsLoaderThread.join();
+        } catch ( InterruptedException e ) {
+            e.printStackTrace();
+        }
+        ChislevQuestionDisplayActivity.GetQuestionList().clear();
+        ChislevQuestionDisplayActivity.GetQuestionList().clear();
     }
 
     // Todo -> save array index and some other housekeeping information
@@ -313,7 +339,7 @@ public class ChislevQuestionDisplayFragment extends Fragment implements LoaderMa
         @Override
         protected void onPostExecute( ArrayList<ChislevQuestion> questionArrayList )
         {
-            mQuestionList = questionArrayList;
+            ChislevQuestionDisplayActivity.SetQuestionList( questionArrayList );
             UpdateMainUIView();
         }
     }
@@ -329,43 +355,45 @@ public class ChislevQuestionDisplayFragment extends Fragment implements LoaderMa
         return questionIntent;
     }
 
-    @SuppressWarnings( "unchecked" )
-    @Override
-    public Loader onCreateLoader( int id, Bundle args ) {
-        final String subjectCode = ChislevSubjectsLaboratory.Get( getActivity() ).GetSubjectItem( mSubjectIndex )
-                .getSubjectCode();
-        String [] referenceIds = new String[ mQuestionList.size() ];
-        for ( int i = 0; i != mQuestionList.size(); ++i ) {
-            referenceIds[i] = mQuestionList.get( i ).getReferenceID();
+    private class LoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor>
+    {
+        @SuppressWarnings( "unchecked" )
+        @Override
+        public Loader onCreateLoader( int id, Bundle args ) {
+            final String subjectCode = ChislevSubjectsLaboratory.Get(getActivity()).GetSubjectItem(mSubjectIndex)
+                    .getSubjectCode();
+            final ArrayList<ChislevQuestion> questionList = ChislevQuestionDisplayActivity.GetQuestionList();
+            String[] referenceIds = new String[questionList.size()];
+            for (int i = 0; i != questionList.size(); ++i) {
+                referenceIds[i] = questionList.get( i ).getReferenceID();
+            }
+            return new ChislevDatabaseManager.ChislevCursorLoader(getActivity(), referenceIds, subjectCode);
         }
-        return new ChislevDatabaseManager.ChislevCursorLoader( getActivity(), referenceIds, subjectCode );
-    }
 
-    @SuppressWarnings( "unchecked" )
-    @Override
-    public void onLoadFinished( Loader loader, Cursor data ) {
-        ChislevDatabaseManager.ChislevSolutionsCursor solutionsCursor = ( ChislevDatabaseManager.ChislevSolutionsCursor )
-                data;
-        if ( solutionsCursor == null ){
-            Log.d( TAG, "SolutionsCursor is NULL. WTF?!" );
-            return;
+        @SuppressWarnings( "unchecked" )
+        @Override
+        public void onLoadFinished( Loader loader, Cursor data ) {
+            ChislevDatabaseManager.ChislevSolutionsCursor solutionsCursor =
+                    ( ChislevDatabaseManager.ChislevSolutionsCursor ) data;
+            if ( solutionsCursor == null ) {
+                Log.d( TAG, "SolutionsCursor is NULL. WTF?!" );
+                return;
+            }
+            ArrayList<ChislevQuestion.ChislevSolutionFormat> solutions = new ArrayList<>();
+            solutionsCursor.moveToFirst();
+            ChislevQuestion.ChislevSolutionFormat solutionFormat = solutionsCursor.GetSolution();
+            while ( solutionFormat != null ) {
+                solutions.add( solutionFormat );
+                solutionsCursor.moveToNext();
+                solutionFormat = solutionsCursor.GetSolution();
+            }
+            Log.d( TAG, "Number of answers grabbed is: " + solutions.size() );
+            ChislevQuestionDisplayActivity.SetAnswerList( solutions );
         }
-        ArrayList<ChislevQuestion.ChislevSolutionFormat> solutions = new ArrayList<>();
-        solutionsCursor.moveToFirst();
-        ChislevQuestion.ChislevSolutionFormat solutionFormat = solutionsCursor.GetSolution();
-        while( solutionFormat != null ){
-            solutions.add( solutionFormat );
-            solutionsCursor.moveToNext();
-            solutionFormat = solutionsCursor.GetSolution();
+
+        @Override
+        public void onLoaderReset( Loader loader ) {
+
         }
-        /* Todo -> Use @local solutions */
-    }
-
-    /* Todo
-    * Implement Database reset
-    */
-    @Override
-    public void onLoaderReset( Loader loader ) {
-
     }
 }
