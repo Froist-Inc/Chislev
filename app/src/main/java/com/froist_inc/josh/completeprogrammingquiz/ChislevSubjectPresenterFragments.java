@@ -47,26 +47,37 @@ public class ChislevSubjectPresenterFragments extends Fragment
     public void onCreate( @Nullable Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
-        setRetainInstance( true );
         getActivity().setTitle( R.string.available_subjects );
 
         mFileManager = new ChislevFileManager( getActivity() );
-        mHandlerThread = new ChislevHandlerThread( getActivity(), new Handler() );
-        mHandlerThread.setListener( new ChislevHandlerThread.Listener() {
-            @Override
-            public void OnSubjectCodeDataObtained( ChislevSubjectInformation subjectInformation )
-            {
-                if( mViewLoading != null ){
-                    mViewLoading.setVisibility( View.INVISIBLE );
-                }
-                if( subjectInformation.isAllSet() ){
-                    mGridView.setAdapter( new ChislevSubjectAdapter( ChislevSubjectsLaboratory.Get( getActivity() ).GetSubjects() ));
-                }
-            }
-        });
+        InitializeHandler();
+    }
 
-        mHandlerThread.start();
-        mHandlerThread.getLooper();
+    private void InitializeHandler()
+    {
+        if( mHandlerThread == null ){
+            mHandlerThread = new ChislevHandlerThread( getActivity(), new Handler() );
+            mHandlerThread.setListener( new ChislevHandlerThread.Listener() {
+                @Override
+                public void OnSubjectCodeDataObtained( ChislevSubjectInformation subjectInformation )
+                {
+                    if( mViewLoading != null ){
+                        mViewLoading.setVisibility( View.INVISIBLE );
+                    }
+                    if( subjectInformation.isAllSet() ){
+                        mGridView.setAdapter( new ChislevSubjectAdapter( ChislevSubjectsLaboratory.Get( getActivity() ).GetSubjects() ));
+                    }
+                }
+            });
+
+            mHandlerThread.start();
+            mHandlerThread.getLooper();
+        } else {
+            if( !mHandlerThread.isAlive() ){
+                mHandlerThread.start();
+                mHandlerThread.getLooper();
+            }
+        }
     }
 
     @Override
@@ -75,6 +86,7 @@ public class ChislevSubjectPresenterFragments extends Fragment
         super.onDestroy();
         if( mHandlerThread != null ){
             mHandlerThread.quit();
+            mHandlerThread = null;
         }
     }
 

@@ -57,7 +57,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
     private RadioButton mFourthOptionRadio;
     private EditText mAnswerText;
 
-    private View /* coverView = null, */ view = null;
+    private View coverView = null, view = null;
 
     private void UpdateQuestionView( int index )
     {
@@ -89,9 +89,13 @@ public class ChislevQuestionDisplayFragment extends Fragment
                               @Nullable Bundle savedInstanceState )
     {
         view = inflater.inflate( R.layout.question_page_fragment, container, false );
-//        coverView = view.findViewById( R.id.question_page_coverLayout );
-//        coverView.setVisibility( View.VISIBLE );
+        coverView = view.findViewById( R.id.overlay_container );
+        coverView.setVisibility( View.VISIBLE );
+        return view;
+    }
 
+    private void InitializeView()
+    {
         Button hintButton = ( Button ) view.findViewById( R.id.hintButton );
         hintButton.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -165,7 +169,6 @@ public class ChislevQuestionDisplayFragment extends Fragment
                 }
             }
         });
-        return view;
     }
 
     @Override
@@ -177,7 +180,6 @@ public class ChislevQuestionDisplayFragment extends Fragment
     public void onCreate( @Nullable Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
-        setRetainInstance( true );
         setHasOptionsMenu( true );
         if( savedInstanceState != null ){
             mSubjectIndex = savedInstanceState.getInt( EXTRA_INDEX );
@@ -212,9 +214,9 @@ public class ChislevQuestionDisplayFragment extends Fragment
         }
 
         // at least we have one or more questions presented to the user, now let's secretly get their solutions ready
-        LoadAnswersWithLoader( getLoaderManager() );
+        getLoaderManager().initLoader( 0, null, new LoaderCallbacks() );
 //        getActivity().setTitle( getString( R.string.question_page_title,  ));
-
+        InitializeView();
         final int anHour = 3600000, oneSecond = 1000;
         new CountDownTimer( anHour, oneSecond ) {
             @Override
@@ -238,19 +240,8 @@ public class ChislevQuestionDisplayFragment extends Fragment
                 DoFinalSubmission();
             }
         }.start();
-//        coverView.setVisibility( View.INVISIBLE );
         UpdateQuestionView( mCurrentQuestionIndex );
-    }
-
-    private void LoadAnswersWithLoader( final LoaderManager loaderManager )
-    {
-         solutionsLoaderThread = new Thread( new Runnable() {
-            @Override
-            public void run() {
-                loaderManager.initLoader( 0, null, new LoaderCallbacks() );
-            }
-        });
-        solutionsLoaderThread.start();
+        coverView.setVisibility( View.INVISIBLE );
     }
 
     // Todo
@@ -260,17 +251,19 @@ public class ChislevQuestionDisplayFragment extends Fragment
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         super.onDestroy();
-        try {
-            solutionsLoaderThread.interrupt();
-            solutionsLoaderThread.join();
-        } catch ( InterruptedException e ) {
-            e.printStackTrace();
+        /* Could be null if an error occurred before it's initialized in the main UI thread */
+        if ( solutionsLoaderThread != null ) {
+            try {
+                solutionsLoaderThread.interrupt();
+                solutionsLoaderThread.join();
+            } catch ( InterruptedException e ) {
+                e.printStackTrace();
+            }
+            ChislevQuestionDisplayActivity.GetQuestionList().clear();
+            ChislevQuestionDisplayActivity.GetQuestionList().clear();
         }
-        ChislevQuestionDisplayActivity.GetQuestionList().clear();
-        ChislevQuestionDisplayActivity.GetQuestionList().clear();
     }
 
     // Todo -> save array index and some other housekeeping information
@@ -372,23 +365,27 @@ public class ChislevQuestionDisplayFragment extends Fragment
 
         @SuppressWarnings( "unchecked" )
         @Override
-        public void onLoadFinished( Loader loader, Cursor data ) {
-            ChislevDatabaseManager.ChislevSolutionsCursor solutionsCursor =
-                    ( ChislevDatabaseManager.ChislevSolutionsCursor ) data;
-            if ( solutionsCursor == null ) {
-                Log.d( TAG, "SolutionsCursor is NULL. WTF?!" );
-                return;
-            }
-            ArrayList<ChislevQuestion.ChislevSolutionFormat> solutions = new ArrayList<>();
-            solutionsCursor.moveToFirst();
-            ChislevQuestion.ChislevSolutionFormat solutionFormat = solutionsCursor.GetSolution();
-            while ( solutionFormat != null ) {
-                solutions.add( solutionFormat );
-                solutionsCursor.moveToNext();
-                solutionFormat = solutionsCursor.GetSolution();
-            }
-            Log.d( TAG, "Number of answers grabbed is: " + solutions.size() );
-            ChislevQuestionDisplayActivity.SetAnswerList( solutions );
+        public void onLoadFinished( Loader loader, final Cursor data ) {
+            solutionsLoaderThread = new Thread( new Runnable() {
+                @Override
+                public void run() {
+                    ChislevDatabaseManager.ChislevSolutionsCursor solutionsCursor = ( ChislevDatabaseManager.ChislevSolutionsCursor) data;
+                    if (solutionsCursor != null) {
+                        ArrayList<ChislevQuestion.ChislevSolutionFormat> solutions = new ArrayList<>();
+                        solutionsCursor.moveToFirst();
+                        ChislevQuestion.ChislevSolutionFormat solutionFormat = solutionsCursor.GetSolution();
+                        while (solutionFormat != null) {
+                            solutions.add(solutionFormat);
+                            solutionsCursor.moveToNext();
+                            solutionFormat = solutionsCursor.GetSolution();
+                        }
+                        ChislevQuestionDisplayActivity.SetAnswerList( solutions );
+                    } else {
+                        Log.d( TAG, "WTF is the solutions NULL?!" );
+                    }
+                }
+            });
+            solutionsLoaderThread.start();
         }
 
         @Override
