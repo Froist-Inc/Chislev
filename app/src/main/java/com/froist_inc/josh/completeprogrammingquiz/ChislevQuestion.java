@@ -15,6 +15,7 @@ class ChislevQuestion
 
     private int mChosenOption;
     private String mAnswer;
+    private boolean usingInputbox = false;
     private boolean mHintUsed = false;
 
     public void setHintUsed()
@@ -26,6 +27,16 @@ class ChislevQuestion
         return mChosenOption;
     }
 
+    public void setUsingInputbox( boolean value )
+    {
+        usingInputbox = value;
+    }
+
+    public boolean isUsingInputbox()
+    {
+        return usingInputbox;
+    }
+
     public void setChosenOption( int mChosenOption ) {
         this.mChosenOption = mChosenOption;
     }
@@ -34,7 +45,7 @@ class ChislevQuestion
         return mAnswer;
     }
 
-    public void setAnswer(String mAnswer) {
+    public void setAnswer( String mAnswer ) {
         this.mAnswer = mAnswer;
     }
 
@@ -107,25 +118,22 @@ class ChislevQuestion
 
     public static class ChislevSolutionFormat
     {
-        private final long mReferenceId;
         private final long mCorrectOption;
         private final String mCorrectText;
 
-        ChislevSolutionFormat( final long referenceId, final long correctOption, final String correctText )
+        private boolean isCorrect = false;
+
+        ChislevSolutionFormat( final long correctOption, final String correctText )
         {
-            mReferenceId = referenceId;
             mCorrectOption = correctOption;
             mCorrectText = correctText;
-        }
-
-        public long getReferenceId() {
-            return mReferenceId;
         }
 
         public long getCorrectOption() {
             return mCorrectOption;
         }
-
+        public void setIsCorrect(){ isCorrect = true; }
+        public boolean IsCorrect(){ return isCorrect; }
         public String getCorrectText() {
             return mCorrectText;
         }

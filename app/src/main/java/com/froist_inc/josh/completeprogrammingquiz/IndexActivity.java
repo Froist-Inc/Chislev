@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class IndexActivity extends AppCompatActivity
@@ -105,19 +106,19 @@ public class IndexActivity extends AppCompatActivity
         }
 
         @Override
-        public View getView(final int position, View convertView, ViewGroup parent ) {
+        public View getView( final int position, View convertView, ViewGroup parent ) {
             if( convertView == null ){
                 convertView = getLayoutInflater().inflate( R.layout.drawer_internal_fragment, parent, false );
             }
             TextView textView = ( TextView ) convertView.findViewById( R.id.internal_textView );
             textView.setText( getString( mItemCaptionList[ position ]));
-            if( position == 0 ){
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams( LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT );
-                params.setMargins( 5, 30, 0, 5 );
-                textView.setLayoutParams( params );
-            }
 
+            if( position == 0 ){
+                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT );
+                layoutParams.setMargins( 10, 100, 0, 10 );
+                textView.setLayoutParams( layoutParams );
+            }
             return convertView;
         }
     }
@@ -143,9 +144,11 @@ public class IndexActivity extends AppCompatActivity
             case 1: default:
                 break;
         }
-        getSupportFragmentManager().beginTransaction().replace( R.id.drawer_mainLayout, fragmentToShow ).commit();
-        mDrawerList.setItemChecked( position, true );
-        mDrawLayout.closeDrawer( mDrawerList );
+        if( fragmentToShow != null ) {
+            getSupportFragmentManager().beginTransaction().replace( R.id.drawer_mainLayout, fragmentToShow ).commit();
+        }
+        mDrawerList.setItemChecked(position, true);
+        mDrawLayout.closeDrawer(mDrawerList);
     }
 
     @Override

@@ -74,6 +74,10 @@ class ChislevHandlerThread extends HandlerThread
             GrabData( subject.getSubjectIconUrl(), subject.getSubjectCode(), ChislevSubjectInformation.ICON_FILENAME );
 
             subject.setIsAllSet( true );
+            /* In case the handler itself or the looper associated with the handler is destroyed, don't do nothing. */
+            if( mDefaultHandler == null || mDefaultHandler.getLooper() == null ){
+                return;
+            }
             mMainUIHandler.post( new Runnable() {
                 @Override
                 public void run() {
@@ -90,8 +94,10 @@ class ChislevHandlerThread extends HandlerThread
 
     public void Prepare( final ChislevSubjectInformation subjectInformation )
     {
-        mData.put( subjectInformation, subjectInformation.getSubjectName() );
-        mDefaultHandler.obtainMessage( ChislevHandlerThread.DATA_INITIALIZE, subjectInformation ).sendToTarget();
+        if( mDefaultHandler.getLooper() != null ) {
+            mData.put( subjectInformation, subjectInformation.getSubjectName() );
+            mDefaultHandler.obtainMessage( ChislevHandlerThread.DATA_INITIALIZE, subjectInformation ).sendToTarget();
+        }
     }
 
     private void GrabData( final String url, final String directory, final String filename )
@@ -103,5 +109,12 @@ class ChislevHandlerThread extends HandlerThread
                 mFileManager.SaveDataToFile( data, filename, directory );
             }
         }
+    }
+
+    @Override
+    public boolean quit() {
+        mData.clear();
+        this.interrupt();
+        return super.quit();
     }
 }

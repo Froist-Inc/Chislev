@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -127,6 +128,7 @@ public class ChislevSubjectPresenterFragments extends Fragment
             }
         });
         LoadStartupConfigFile();
+        InitializeHandler();
         return layoutView;
     }
 
@@ -137,8 +139,12 @@ public class ChislevSubjectPresenterFragments extends Fragment
         if( resultCode == Activity.RESULT_OK ) {
             if ( requestCode == LEVEL_REQUEST_CODE ){
                 mSubjectDifficultyLevel = data.getIntExtra( ChislevChooseLevelDialog.DIFFICULTY_LEVEL, -1 );
-                Fragment dialogFragment = getActivity().getSupportFragmentManager()
-                        .findFragmentByTag( ChislevChooseLevelDialog.TAG );
+                /* If the activity its attached to is already destroyed, we don't have an option but to cancel */
+                if( getActivity() == null ){
+                    return;
+                }
+
+                Fragment dialogFragment = getActivity().getSupportFragmentManager().findFragmentByTag( ChislevChooseLevelDialog.TAG );
                 if( dialogFragment != null ){
                     ChislevChooseLevelDialog dialog = ( ChislevChooseLevelDialog ) dialogFragment;
                     dialog.dismiss();
@@ -249,8 +255,10 @@ public class ChislevSubjectPresenterFragments extends Fragment
         if( ChislevSubjectsLaboratory.Get( getActivity() ).GetSubjects().size() == 0 ) {
             mGridView.setAdapter( new ChislevSubjectAdapter( new ArrayList<ChislevSubjectInformation>() ) );
         } else {
-            for ( int i = 0; i < ChislevSubjectsLaboratory.Get( getActivity() ).GetSubjects().size(); ++i ) {
-                mHandlerThread.Prepare( ChislevSubjectsLaboratory.Get( getActivity() ).GetSubjectItem( i ) );
+            if( mHandlerThread != null ){
+                for ( int i = 0; i < ChislevSubjectsLaboratory.Get( getActivity() ).GetSubjects().size(); ++i ) {
+                    mHandlerThread.Prepare( ChislevSubjectsLaboratory.Get( getActivity() ).GetSubjectItem( i ));
+                }
             }
         }
     }

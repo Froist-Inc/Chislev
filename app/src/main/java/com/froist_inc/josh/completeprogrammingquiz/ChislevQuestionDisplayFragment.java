@@ -2,6 +2,7 @@ package com.froist_inc.josh.completeprogrammingquiz;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -11,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -21,6 +23,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -56,8 +60,10 @@ public class ChislevQuestionDisplayFragment extends Fragment
     private RadioButton mThirdOptionRadio;
     private RadioButton mFourthOptionRadio;
     private EditText mAnswerText;
+    private CheckBox mUsingStringCheckbox;
+    private CountDownTimer mCountDownTimer;
 
-    private View coverView = null, view = null;
+    private View view = null;
 
     private void UpdateQuestionView( int index )
     {
@@ -73,14 +79,16 @@ public class ChislevQuestionDisplayFragment extends Fragment
         } else {
             mContributorTextView.setText( getString( R.string.question_contributor, currentQuestion.getOwner() ));
         }
-        mQuestionIndexTextView.setText( "Question " + ( index + 1 ) + " of " +
-                ChislevQuestionDisplayActivity.GetQuestionList().size() );
+        mQuestionIndexTextView.setText( getString( R.string.question_index, ( index + 1 ),
+                ChislevQuestionDisplayActivity.GetQuestionList().size() ) );
         mQuestionTextView.setText( currentQuestion.getQuestion().trim() );
         mFirstOptionRadio.setText( currentQuestion.getAvailableOptions().get( 0 ));
         mSecondOptionRadio.setText( currentQuestion.getAvailableOptions().get( 1 ));
         mThirdOptionRadio.setText( currentQuestion.getAvailableOptions().get( 2 ));
         mFourthOptionRadio.setText( currentQuestion.getAvailableOptions().get( 3 ));
         mAnswerText.setText( currentQuestion.getAnswer() != null ? currentQuestion.getAnswer() : "" );
+        mUsingStringCheckbox.setChecked( false );
+        mAnswerText.setVisibility( View.INVISIBLE );
     }
 
     @Nullable
@@ -89,8 +97,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
                               @Nullable Bundle savedInstanceState )
     {
         view = inflater.inflate( R.layout.question_page_fragment, container, false );
-        coverView = view.findViewById( R.id.overlay_container );
-        coverView.setVisibility( View.VISIBLE );
+        new ChislevSubjectProcessingTask().execute();
         return view;
     }
 
@@ -106,13 +113,32 @@ public class ChislevQuestionDisplayFragment extends Fragment
             }
         });
         mAnswerText = ( EditText ) view.findViewById( R.id.chosen_option_editText );
+
+        mUsingStringCheckbox = ( CheckBox ) view.findViewById( R.id.use_input_checkBox );
+        mUsingStringCheckbox.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged( CompoundButton buttonView, boolean isChecked ) {
+                if( isChecked ){
+                    mAnswerText.setVisibility( View.VISIBLE );
+                } else {
+                    mAnswerText.setVisibility( View.INVISIBLE );
+                    ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setAnswer( "" );
+                }
+
+                mAnswerText.setText( "" );
+                mUsingStringCheckbox.setChecked( isChecked );
+                ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setUsingInputbox( isChecked );
+            }
+        });
         mAnswerText.addTextChangedListener( new TextWatcher() {
             @Override
             public void beforeTextChanged( CharSequence s, int start, int count, int after ) {}
 
             @Override
             public void onTextChanged( CharSequence s, int start, int before, int count ) {
-                ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setAnswer( s.toString() );
+                if ( mUsingStringCheckbox.isChecked() ) {
+                    ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setAnswer( s.toString() );
+                }
             }
 
             @Override
@@ -127,13 +153,13 @@ public class ChislevQuestionDisplayFragment extends Fragment
             public void onClick( View v ) {
                 if( mCurrentQuestionIndex == ChislevQuestionDisplayActivity.GetQuestionList().size() - 1 ){
                     DoFinalSubmission();
-                    return;
+                } else {
+                    ++mCurrentQuestionIndex;
+                    if ( mCurrentQuestionIndex == ChislevQuestionDisplayActivity.GetQuestionList().size() - 1) {
+                        nextQuestionButton.setText(getString(R.string.submit_text));
+                    }
+                    UpdateQuestionView(mCurrentQuestionIndex);
                 }
-                ++mCurrentQuestionIndex;
-                if( mCurrentQuestionIndex == ChislevQuestionDisplayActivity.GetQuestionList().size() - 1 ){
-                    nextQuestionButton.setText( getString( R.string.submit_text ));
-                }
-                UpdateQuestionView( mCurrentQuestionIndex );
             }
         });
         mCodeView = ( WebView ) view.findViewById( R.id.question_codeWebView );
@@ -152,16 +178,16 @@ public class ChislevQuestionDisplayFragment extends Fragment
             public void onCheckedChanged( RadioGroup group, int checkedId ) {
                 switch( checkedId ){
                     case R.id.question_option_oneRadioButton:
-                        ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setChosenOption( 0 );
-                        break;
-                    case R.id.question_option_twoRadioButton:
                         ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setChosenOption( 1 );
                         break;
-                    case R.id.question_option_threeRadioButton:
+                    case R.id.question_option_twoRadioButton:
                         ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setChosenOption( 2 );
                         break;
-                    case R.id.question_option_fourRadioButton:
+                    case R.id.question_option_threeRadioButton:
                         ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setChosenOption( 3 );
+                        break;
+                    case R.id.question_option_fourRadioButton:
+                        ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setChosenOption( 4 );
                         break;
                     default:
                         ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setChosenOption( -1 );
@@ -181,11 +207,11 @@ public class ChislevQuestionDisplayFragment extends Fragment
     {
         super.onCreate( savedInstanceState );
         setHasOptionsMenu( true );
+        setRetainInstance( true );
         if( savedInstanceState != null ){
             mSubjectIndex = savedInstanceState.getInt( EXTRA_INDEX );
             mLevel = savedInstanceState.getInt( EXTRA_LEVEL );
         }
-        new ChislevSubjectProcessingTask().execute();
     }
 
     @Override
@@ -213,41 +239,68 @@ public class ChislevQuestionDisplayFragment extends Fragment
             return;
         }
 
-        // at least we have one or more questions presented to the user, now let's secretly get their solutions ready
+        /* at least we have one or more questions presented to the user, now let's secretly get their solutions */
         getLoaderManager().initLoader( 0, null, new LoaderCallbacks() );
-//        getActivity().setTitle( getString( R.string.question_page_title,  ));
         InitializeView();
-        final int anHour = 3600000, oneSecond = 1000;
-        new CountDownTimer( anHour, oneSecond ) {
-            @Override
-            public void onTick( long millisUntilFinished )
-            {
-                long x = millisUntilFinished / 1000;
-                long seconds = x % 60;
-                x /= 60;
-                int minutes = ( int ) x % 60;
-                x /= 60;
-                int hours = ( int ) x % 24;
-                String text = "" + ( hours > 0 ? ( hours + "h" ) : "" ) +
-                        ( minutes > 0 ? ( minutes + "m" ) : "" ) +
-                        seconds + "s";
-                mTimerTextView.setText( text );
-            }
 
-            @Override
-            public void onFinish()
-            {
-                DoFinalSubmission();
-            }
-        }.start();
+        final int anHour = 3600000, oneSecond = 1000;
+        if( mCountDownTimer == null ) {
+            mCountDownTimer = new CountDownTimer( anHour, oneSecond ) {
+                @Override
+                public void onTick( long millisUntilFinished ) {
+                    long x = millisUntilFinished / 1000;
+                    long seconds = x % 60;
+                    x /= 60;
+                    int minutes = ( int ) x % 60;
+                    x /= 60;
+                    int hours = ( int ) x % 24;
+                    String text = "" + ( hours > 0 ? (hours + "h") : "" ) +
+                            ( minutes > 0 ? ( minutes + "m" ) : "" ) +
+                            seconds + "s";
+                    mTimerTextView.setText(text);
+                }
+
+                @Override
+                public void onFinish() {
+                    DoFinalSubmission();
+                }
+            };
+            mCountDownTimer.start();
+        }
         UpdateQuestionView( mCurrentQuestionIndex );
-        coverView.setVisibility( View.INVISIBLE );
     }
 
-    // Todo
     private void DoFinalSubmission()
     {
+        final ArrayList<ChislevQuestion> questionList = ChislevQuestionDisplayActivity.GetQuestionList();
+        final ArrayList<ChislevQuestion.ChislevSolutionFormat> solutionList = ChislevQuestionDisplayActivity.GetSolutionList();
+        for( int i = 0; i != questionList.size(); ++i ){
+            ChislevQuestion currentQuestion = questionList.get( i );
+            ChislevQuestion.ChislevSolutionFormat currentGottenSolution = solutionList.get( i );
 
+            Log.d( TAG, "Chosen option = " + currentQuestion.getChosenOption() );
+            Log.d( TAG, "Solution option = " + currentGottenSolution.getCorrectOption() );
+
+            Log.d( TAG, "Correct text = " + currentGottenSolution.getCorrectText() );
+            Log.d( TAG, "Chosen text = " + currentQuestion.getAnswer() );
+
+            final String answer = currentQuestion.getAnswer() == null ? "" : currentQuestion.getAnswer();
+            if( currentQuestion.getChosenOption() == currentGottenSolution.getCorrectOption() ){
+                if( currentGottenSolution.getCorrectText().equals( answer ) ){
+                    currentGottenSolution.setIsCorrect();
+                }
+            }
+        }
+
+        new AlertDialog.Builder( getActivity() ).setMessage( R.string.display_solution_message )
+                .setTitle( R.string.display_solution_title )
+                .setPositiveButton( android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick( DialogInterface dialog, int which ) {
+                        dialog.dismiss();
+                        ( ( ChislevQuestionDisplayActivity ) getActivity() ).FragmentWorkCompleted();
+                    }
+                }).show();
     }
 
     @Override
@@ -261,16 +314,8 @@ public class ChislevQuestionDisplayFragment extends Fragment
             } catch ( InterruptedException e ) {
                 e.printStackTrace();
             }
-            ChislevQuestionDisplayActivity.GetQuestionList().clear();
-            ChislevQuestionDisplayActivity.GetQuestionList().clear();
+            solutionsLoaderThread = null;
         }
-    }
-
-    // Todo -> save array index and some other housekeeping information
-    @Override
-    public void onSaveInstanceState( Bundle outState )
-    {
-        super.onSaveInstanceState( outState );
     }
 
     private class ChislevSubjectProcessingTask extends AsyncTask<Void, Void, ArrayList<ChislevQuestion> >
@@ -278,11 +323,11 @@ public class ChislevQuestionDisplayFragment extends Fragment
         private ArrayList<ChislevQuestion> FilterQuestions( final Map<String, ArrayList<ChislevQuestion> > questionMap,
                                                             final String filterCriteria )
         {
-            boolean notRandom = filterCriteria.compareToIgnoreCase( "Beginner" ) == 0 ||
+            boolean isBasicFilter = filterCriteria.compareToIgnoreCase( "Beginner" ) == 0 ||
                     filterCriteria.compareToIgnoreCase( "Intermediate" ) == 0 ||
                     filterCriteria.compareToIgnoreCase( "Advanced" ) == 0;
             ArrayList<ChislevQuestion> questions;
-            if( !notRandom ){
+            if( isBasicFilter ){
                 questions = questionMap.get( filterCriteria );
             } else {
                 // TODO: 24-Sep-16
@@ -321,10 +366,9 @@ public class ChislevQuestionDisplayFragment extends Fragment
                 final String filteringLevel = LevelToString( mLevel );
                 return FilterQuestions( questionMap, filteringLevel );
             } catch( IOException except ) {
-//                Todo
-//                Log.d();
+                Log.d( TAG, except.getLocalizedMessage(), except );
             } catch ( XmlPullParserException exception ){
-//                Todo
+                Log.d( TAG, "XML could not be parsed.", exception );
             }
             return null;
         }

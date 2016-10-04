@@ -83,7 +83,7 @@ class ChislevDatabaseManager extends SQLiteOpenHelper
 
         public Cursor GetSolutionCursor( String [] referenceIdList )
         {
-            final String query = "SELECT reference_id, option, answer_text FROM " + TABLE_NAME + " WHERE reference_id IN "
+            final String query = "SELECT option, answer_text FROM " + TABLE_NAME + " WHERE reference_id IN "
                     + "( ";
             StringBuilder sqlInExpression = new StringBuilder( query );
             final int listSize = referenceIdList.length - 1;
@@ -118,10 +118,9 @@ class ChislevDatabaseManager extends SQLiteOpenHelper
         {
             if( isBeforeFirst() || isAfterLast() ) return null;
 
-            final long referenceId = getLong( getColumnIndex( "reference_id" ) ),
-                    correctOption = getLong( getColumnIndex( "option" ) );
+            final long correctOption = getLong( getColumnIndex( "option" ) );
             final String correctText = getString( getColumnIndex( "answer_text" ) );
-            return new ChislevQuestion.ChislevSolutionFormat( referenceId, correctOption, correctText );
+            return new ChislevQuestion.ChislevSolutionFormat( correctOption, correctText );
         }
     }
 

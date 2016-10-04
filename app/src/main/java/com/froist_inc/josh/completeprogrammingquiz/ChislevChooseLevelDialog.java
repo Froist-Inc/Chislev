@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
 import android.view.View;
@@ -36,7 +37,7 @@ public class ChislevChooseLevelDialog extends DialogFragment
 
         ArrayList<Integer> dummyList = new ArrayList<>();
         for ( int i = 0; i != LEVEL_SIZE; i++ ) {
-            dummyList.add(i);
+            dummyList.add( i );
         }
         levelGridView.setAdapter( new ChislevLevelAdapter( dummyList ) );
         levelGridView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
@@ -58,12 +59,13 @@ public class ChislevChooseLevelDialog extends DialogFragment
 
     private void SendTargetResponse( int result, int position )
     {
-        if( getTargetFragment() != null )
+        Fragment targetFragment = getTargetFragment();
+        if( targetFragment != null )
         {
             Intent resultIntent = new Intent();
             resultIntent.putExtra( DIFFICULTY_LEVEL, position );
-            getTargetFragment().onActivityResult( ChislevSubjectPresenterFragments.LEVEL_REQUEST_CODE, result,
-                    resultIntent );
+            targetFragment.onActivityResult( ChislevSubjectPresenterFragments.LEVEL_REQUEST_CODE, result, resultIntent );
+            this.dismiss();
         }
     }
 

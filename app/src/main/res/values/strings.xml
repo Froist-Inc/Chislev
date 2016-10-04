@@ -8,8 +8,10 @@
     <string name="question_text">Question</string>
     <string name="forfeit_test">Forfeit</string>
     <string name="hint">Hint</string>
+    <string name="display_solution_title">Solution</string>
+    <string name="display_solution_message">Thank you for participating. You may display solutions now.</string>
     <string name="question_page_title">%1$s( %2$s )</string>
-    <string name="show_hint_confirmation">Are you sure you want to see the hint? 1/2 mark is awarded.</string>
+    <string name="show_hint_confirmation">Are you sure you want to see the hint? &#189; mark is awarded.</string>
     <string name="answerHint">Input text here</string>
     <string name="available_subjects">Available Subjects</string>
     <string name="next">Next</string>
@@ -18,8 +20,15 @@
     <string name="timer_display">Timer display</string>
     <string name="menu_item">Actions</string>
     <string name="difficulty_level_title"> Difficulty level</string>
+    <string name="use_text_box">Use input text?</string>
     <string name="take_quiz"> Take a Quiz </string>
     <string name="scores">Scores</string>
     <string name="contribute">Contribute new Questions</string>
     <string name="attributes">Special Thanks</string>
+    <string name="question_number"> Question %1$d </string>
+    <string name="correct_answer">Correct Answer</string>
+    <string name="reason">Reason</string>
+    <string name="correct">Correct!</string>
+    <string name="wrong">Wrong!</string>
+    <string name="question_index"> Question %1$d of %2$d.</string>
 </resources>
