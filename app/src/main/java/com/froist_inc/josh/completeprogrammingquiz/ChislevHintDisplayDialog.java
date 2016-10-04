@@ -14,7 +14,7 @@ public class ChislevHintDisplayDialog extends android.support.v4.app.DialogFragm
     @NonNull
     @Override
     public Dialog onCreateDialog( Bundle savedInstanceState ) {
-        Dialog dialog = new Dialog( getActivity() );
+        final Dialog dialog = new Dialog( getActivity() );
         dialog.setTitle( R.string.hint );
         dialog.setCancelable( false );
         dialog.setContentView( R.layout.hint_display_fragment );
@@ -22,16 +22,22 @@ public class ChislevHintDisplayDialog extends android.support.v4.app.DialogFragm
         yesButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick( View v ) {
-                getTargetFragment().onActivityResult( ChislevQuestionDisplayFragment.HINT_CHECK,
-                        Activity.RESULT_OK, null );
+                if( getTargetFragment() != null ) {
+                    getTargetFragment().onActivityResult( ChislevQuestionDisplayFragment.HINT_CHECK, Activity.RESULT_OK,
+                            null );
+                }
+                dialog.dismiss();
             }
         });
         Button noButton = ( Button ) dialog.findViewById( R.id.noButton );
         noButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick( View v ) {
-                getTargetFragment().onActivityResult( ChislevQuestionDisplayFragment.HINT_CHECK,
-                        Activity.RESULT_CANCELED, null );
+                if( getTargetFragment() != null ) {
+                    getTargetFragment().onActivityResult( ChislevQuestionDisplayFragment.HINT_CHECK,
+                            Activity.RESULT_CANCELED, null );
+                }
+                dialog.dismiss();
             }
         });
         return dialog;

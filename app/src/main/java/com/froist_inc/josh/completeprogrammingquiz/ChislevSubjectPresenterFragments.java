@@ -19,7 +19,6 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -156,7 +155,7 @@ public class ChislevSubjectPresenterFragments extends Fragment
 
     private void DisplayQuestionPage()
     {
-        final Intent questionIntent = ChislevQuestionDisplayFragment.GetQuestionDisplayIntent( getActivity(),
+        final Intent questionIntent = ChislevQuestionDisplayActivity.GetQuestionDisplayIntent( getActivity(),
                 mSubjectIndex, mSubjectDifficultyLevel );
         startActivity( questionIntent );
     }

@@ -1,7 +1,6 @@
 package com.froist_inc.josh.completeprogrammingquiz;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -208,10 +207,8 @@ public class ChislevQuestionDisplayFragment extends Fragment
         super.onCreate( savedInstanceState );
         setHasOptionsMenu( true );
         setRetainInstance( true );
-        if( savedInstanceState != null ){
-            mSubjectIndex = savedInstanceState.getInt( EXTRA_INDEX );
-            mLevel = savedInstanceState.getInt( EXTRA_LEVEL );
-        }
+        mSubjectIndex = getArguments().getInt( EXTRA_INDEX );
+        mLevel = getArguments().getInt( EXTRA_LEVEL );
     }
 
     @Override
@@ -221,6 +218,9 @@ public class ChislevQuestionDisplayFragment extends Fragment
         if( requestCode == ChislevQuestionDisplayFragment.HINT_CHECK ) {
             if ( resultCode == Activity.RESULT_OK ) {
                 ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setHintUsed();
+                new AlertDialog.Builder( getActivity() ).setTitle( R.string.hint )
+                        .setMessage( ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).getHint() )
+                        .setPositiveButton( android.R.string.ok, null ).show();
             }
             Fragment hintDialogFragment = getActivity().getSupportFragmentManager()
                     .findFragmentByTag( ChislevHintDisplayDialog.TAG );
@@ -243,9 +243,9 @@ public class ChislevQuestionDisplayFragment extends Fragment
         getLoaderManager().initLoader( 0, null, new LoaderCallbacks() );
         InitializeView();
 
-        final int anHour = 3600000, oneSecond = 1000;
+        final int thirtySeconds = 30000, timeElapsed = thirtySeconds * questionList.size(), oneSecond = 1000;
         if( mCountDownTimer == null ) {
-            mCountDownTimer = new CountDownTimer( anHour, oneSecond ) {
+            mCountDownTimer = new CountDownTimer( timeElapsed, oneSecond ) {
                 @Override
                 public void onTick( long millisUntilFinished ) {
                     long x = millisUntilFinished / 1000;
@@ -272,17 +272,12 @@ public class ChislevQuestionDisplayFragment extends Fragment
 
     private void DoFinalSubmission()
     {
+        mCountDownTimer.cancel();
         final ArrayList<ChislevQuestion> questionList = ChislevQuestionDisplayActivity.GetQuestionList();
         final ArrayList<ChislevQuestion.ChislevSolutionFormat> solutionList = ChislevQuestionDisplayActivity.GetSolutionList();
         for( int i = 0; i != questionList.size(); ++i ){
             ChislevQuestion currentQuestion = questionList.get( i );
             ChislevQuestion.ChislevSolutionFormat currentGottenSolution = solutionList.get( i );
-
-            Log.d( TAG, "Chosen option = " + currentQuestion.getChosenOption() );
-            Log.d( TAG, "Solution option = " + currentGottenSolution.getCorrectOption() );
-
-            Log.d( TAG, "Correct text = " + currentGottenSolution.getCorrectText() );
-            Log.d( TAG, "Chosen text = " + currentQuestion.getAnswer() );
 
             final String answer = currentQuestion.getAnswer() == null ? "" : currentQuestion.getAnswer();
             if( currentQuestion.getChosenOption() == currentGottenSolution.getCorrectOption() ){
@@ -293,14 +288,19 @@ public class ChislevQuestionDisplayFragment extends Fragment
         }
 
         new AlertDialog.Builder( getActivity() ).setMessage( R.string.display_solution_message )
-                .setTitle( R.string.display_solution_title )
-                .setPositiveButton( android.R.string.ok, new DialogInterface.OnClickListener() {
+                .setTitle( R.string.display_solution_title ).setPositiveButton( android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick( DialogInterface dialog, int which ) {
                         dialog.dismiss();
-                        ( ( ChislevQuestionDisplayActivity ) getActivity() ).FragmentWorkCompleted();
                     }
                 }).show();
+        RecordScores();
+        ( ( ChislevQuestionDisplayActivity ) getActivity() ).FragmentWorkCompleted();
+    }
+
+    private void RecordScores()
+    {
+        // Todo
     }
 
     @Override
@@ -325,7 +325,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
         {
             boolean isBasicFilter = filterCriteria.compareToIgnoreCase( "Beginner" ) == 0 ||
                     filterCriteria.compareToIgnoreCase( "Intermediate" ) == 0 ||
-                    filterCriteria.compareToIgnoreCase( "Advanced" ) == 0;
+                    filterCriteria.compareToIgnoreCase( "Hard" ) == 0;
             ArrayList<ChislevQuestion> questions;
             if( isBasicFilter ){
                 questions = questionMap.get( filterCriteria );
@@ -347,7 +347,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
                 case 1:
                     return "Intermediate";
                 case 2:
-                    return "Advanced";
+                    return "Hard";
                 default:
                     return "Random";
             }
@@ -379,17 +379,6 @@ public class ChislevQuestionDisplayFragment extends Fragment
             ChislevQuestionDisplayActivity.SetQuestionList( questionArrayList );
             UpdateMainUIView();
         }
-    }
-
-    public static Intent GetQuestionDisplayIntent( Context context, int subjectIndex, int difficultyLevel )
-    {
-        Bundle extraData = new Bundle();
-        extraData.putInt( EXTRA_INDEX, subjectIndex );
-        extraData.putInt( EXTRA_LEVEL, difficultyLevel );
-
-        Intent questionIntent = new Intent( context, ChislevQuestionDisplayActivity.class );
-        questionIntent.putExtra( EXTRA, extraData );
-        return questionIntent;
     }
 
     private class LoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor>
@@ -436,5 +425,15 @@ public class ChislevQuestionDisplayFragment extends Fragment
         public void onLoaderReset( Loader loader ) {
 
         }
+    }
+
+    public static Fragment newInstance( int subjectIndex, int subjectLevel )
+    {
+        Bundle bundle = new Bundle();
+        bundle.putInt( EXTRA_INDEX, subjectIndex );
+        bundle.putInt( EXTRA_LEVEL, subjectLevel );
+        ChislevQuestionDisplayFragment displayFragment = new ChislevQuestionDisplayFragment();
+        displayFragment.setArguments( bundle );
+        return displayFragment;
     }
 }

@@ -1,5 +1,7 @@
 package com.froist_inc.josh.completeprogrammingquiz;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -7,7 +9,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -21,7 +22,19 @@ public class ChislevQuestionDisplayActivity extends AppCompatActivity
     private static ArrayList<ChislevQuestion> questionList;
     private static ArrayList<ChislevQuestion.ChislevSolutionFormat> solutionList;
     private static final String FRAG = "CurrentFragment";
+    private static final String EXTRA_INDEX = "EXTRA_INDEX", EXTRA_LEVEL = "EXTRA_LEVEL", EXTRA = "EXTRA_DATA";
+
     private int currentFragment = 0;
+
+    private int mSubjectLevel, mSubjectIndex;
+
+    public static Intent GetQuestionDisplayIntent(Context context, int subjectIndex, int difficultyLevel )
+    {
+        Intent questionIntent = new Intent( context, ChislevQuestionDisplayActivity.class );
+        questionIntent.putExtra( EXTRA_INDEX, subjectIndex );
+        questionIntent.putExtra( EXTRA_LEVEL, difficultyLevel );
+        return questionIntent;
+    }
 
     @Override
     protected void onCreate( @Nullable Bundle savedInstanceState )
@@ -32,6 +45,9 @@ public class ChislevQuestionDisplayActivity extends AppCompatActivity
         final int containerID = GetContainerID();
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentById( containerID );
+
+        mSubjectIndex = getIntent().getIntExtra( EXTRA_INDEX, 0 );
+        mSubjectLevel = getIntent().getIntExtra( EXTRA_LEVEL, 0 );
 
         if( fragment == null ){
             if( savedInstanceState != null ){
@@ -66,7 +82,6 @@ public class ChislevQuestionDisplayActivity extends AppCompatActivity
     public boolean onOptionsItemSelected( MenuItem item ) {
         switch ( item.getItemId() ){
             case R.id.menu_question_page_forfeit:
-                Log.d( TAG, "Forfeiting" );
                 return true;
             case android.R.id.home:
                 if( NavUtils.getParentActivityName( this ) != null ){
@@ -81,7 +96,7 @@ public class ChislevQuestionDisplayActivity extends AppCompatActivity
     public Fragment GetFragment()
     {
         if( currentFragment == 0 ) {
-            return new ChislevQuestionDisplayFragment();
+            return ChislevQuestionDisplayFragment.newInstance( mSubjectIndex, mSubjectLevel );
         } else {
             return new ChislevSolutionsFragment();
         }

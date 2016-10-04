@@ -51,10 +51,12 @@ public class ChislevViewSolutionFragment extends Fragment
         codeView.loadData( mQuestion.getCode(), "text/html", "UTF-8" );
         codeView.reload();
 
+        /* The options started from index 1, that's always one integer past the array */
+        int index = ( int ) mSolution.getCorrectOption() - 1;
+        String answerString = mQuestion.getAvailableOptions().get( index ) + " " + mSolution.getCorrectText();
         TextView correctAnswerTextView = ( TextView ) view.findViewById( R.id.correct_answer_textView );
-        String answerString = mQuestion.getAvailableOptions().get( ( int ) mSolution.getCorrectOption() ) + " " +
-                mSolution.getCorrectText();
         correctAnswerTextView.setText( answerString );
+
         TextView reasonShowTextView = ( TextView ) view.findViewById( R.id.reason_show_textView );
         reasonShowTextView.setText( mQuestion.getExplanation() );
         return view;
