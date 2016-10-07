@@ -14,6 +14,8 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,13 +37,16 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ChislevQuestionDisplayFragment extends Fragment
 {
     private static final String TAG = "QuestionDisplayFragment";
     public static final int HINT_CHECK = 1;
-    private static final String EXTRA_INDEX = "EXTRA_INDEX", EXTRA_LEVEL = "EXTRA_LEVEL", EXTRA = "EXTRA_DATA";
+    private static final String EXTRA_INDEX = "EXTRA_INDEX", EXTRA_LEVEL = "EXTRA_LEVEL";
 
     private int mCurrentQuestionIndex = 0;
     private int mSubjectIndex;
@@ -63,6 +68,8 @@ public class ChislevQuestionDisplayFragment extends Fragment
     private CountDownTimer mCountDownTimer;
 
     private View view = null;
+
+    Date mTimeStarted, mTimeCompleted;
 
     private void UpdateQuestionView( int index )
     {
@@ -267,14 +274,18 @@ public class ChislevQuestionDisplayFragment extends Fragment
             };
             mCountDownTimer.start();
         }
+        mTimeStarted = new Date();
         UpdateQuestionView( mCurrentQuestionIndex );
     }
 
     private void DoFinalSubmission()
     {
         mCountDownTimer.cancel();
+        mTimeCompleted = new Date();
         final ArrayList<ChislevQuestion> questionList = ChislevQuestionDisplayActivity.GetQuestionList();
         final ArrayList<ChislevQuestion.ChislevSolutionFormat> solutionList = ChislevQuestionDisplayActivity.GetSolutionList();
+
+        int totalScore = 0;
         for( int i = 0; i != questionList.size(); ++i ){
             ChislevQuestion currentQuestion = questionList.get( i );
             ChislevQuestion.ChislevSolutionFormat currentGottenSolution = solutionList.get( i );
@@ -283,24 +294,63 @@ public class ChislevQuestionDisplayFragment extends Fragment
             if( currentQuestion.getChosenOption() == currentGottenSolution.getCorrectOption() ){
                 if( currentGottenSolution.getCorrectText().equals( answer ) ){
                     currentGottenSolution.setIsCorrect();
+                    ++totalScore;
                 }
             }
         }
-
-        new AlertDialog.Builder( getActivity() ).setMessage( R.string.display_solution_message )
+        new AlertDialog.Builder( this.getContext() )
+                .setMessage( R.string.display_solution_message )
                 .setTitle( R.string.display_solution_title ).setPositiveButton( android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick( DialogInterface dialog, int which ) {
-                        dialog.dismiss();
-                    }
-                }).show();
-        RecordScores();
+            @Override
+            public void onClick( DialogInterface dialog, int which ) {
+                if ( dialog != null ) {
+                    dialog.dismiss();
+                }
+            }
+        }).show();
+        RecordScores( totalScore );
         ( ( ChislevQuestionDisplayActivity ) getActivity() ).FragmentWorkCompleted();
     }
 
-    private void RecordScores()
+    public String LevelToString( final int level )
     {
-        // Todo
+        switch( level ){
+            case 0:
+                return "Beginner";
+            case 1:
+                return "Intermediate";
+            case 2:
+                return "Hard";
+            default:
+                return "Random";
+        }
+    }
+
+    private void RecordScores( final int totalScore )
+    {
+        final ChislevScoresFormat score = new ChislevScoresFormat();
+        final java.text.DateFormat dateFormat = DateFormat.getDateFormat( getActivity() ),
+            timeFormat = DateFormat.getTimeFormat( getActivity() );
+        final long timeDifference = mTimeCompleted.getTime() - mTimeStarted.getTime();
+        final long diffSeconds = timeDifference / DateUtils.SECOND_IN_MILLIS;
+
+        score.setQuizLevelTaken( LevelToString( mLevel ) );
+        score.setDayQuizTaken( dateFormat.format( mTimeStarted ) );
+        score.setTimeStarted( timeFormat.format( mTimeStarted ) );
+        score.setTotalScores( totalScore );
+        score.setTotalTimeUsed( DateUtils.formatElapsedTime( diffSeconds ) );
+        score.setQuestionTotal( ChislevQuestionDisplayActivity.GetQuestionList().size() );
+
+        final String code = ChislevSubjectsLaboratory.Get( getActivity() ).GetSubjectItem( mSubjectIndex ).getSubjectCode();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute( new Runnable() {
+            @Override
+            public void run() {
+                boolean success = ChislevScoresDatabaseManager.InsertNewScore( getActivity(), score, code );
+                Log.d( TAG, success ? "Succeeded!" : "Failed" );
+            }
+        });
+        executorService.shutdown();
     }
 
     @Override
@@ -339,20 +389,6 @@ public class ChislevQuestionDisplayFragment extends Fragment
             return questions;
         }
 
-        private String LevelToString( int level )
-        {
-            switch( level ){
-                case 0:
-                    return "Beginner";
-                case 1:
-                    return "Intermediate";
-                case 2:
-                    return "Hard";
-                default:
-                    return "Random";
-            }
-        }
-
         @Override
         protected ArrayList<ChislevQuestion> doInBackground( Void... params )
         {
@@ -386,14 +422,14 @@ public class ChislevQuestionDisplayFragment extends Fragment
         @SuppressWarnings( "unchecked" )
         @Override
         public Loader onCreateLoader( int id, Bundle args ) {
-            final String subjectCode = ChislevSubjectsLaboratory.Get(getActivity()).GetSubjectItem(mSubjectIndex)
+            final String subjectCode = ChislevSubjectsLaboratory.Get( getActivity()).GetSubjectItem( mSubjectIndex)
                     .getSubjectCode();
             final ArrayList<ChislevQuestion> questionList = ChislevQuestionDisplayActivity.GetQuestionList();
             String[] referenceIds = new String[questionList.size()];
             for (int i = 0; i != questionList.size(); ++i) {
                 referenceIds[i] = questionList.get( i ).getReferenceID();
             }
-            return new ChislevDatabaseManager.ChislevCursorLoader(getActivity(), referenceIds, subjectCode);
+            return new ChislevDatabaseManager.ChislevCursorLoader( getActivity(), referenceIds, subjectCode );
         }
 
         @SuppressWarnings( "unchecked" )
@@ -402,13 +438,13 @@ public class ChislevQuestionDisplayFragment extends Fragment
             solutionsLoaderThread = new Thread( new Runnable() {
                 @Override
                 public void run() {
-                    ChislevDatabaseManager.ChislevSolutionsCursor solutionsCursor = ( ChislevDatabaseManager.ChislevSolutionsCursor) data;
-                    if (solutionsCursor != null) {
+                    ChislevDatabaseManager.ChislevSolutionsCursor solutionsCursor = ( ChislevDatabaseManager.ChislevSolutionsCursor ) data;
+                    if ( solutionsCursor != null ) {
                         ArrayList<ChislevQuestion.ChislevSolutionFormat> solutions = new ArrayList<>();
                         solutionsCursor.moveToFirst();
                         ChislevQuestion.ChislevSolutionFormat solutionFormat = solutionsCursor.GetSolution();
-                        while (solutionFormat != null) {
-                            solutions.add(solutionFormat);
+                        while ( solutionFormat != null ) {
+                            solutions.add( solutionFormat );
                             solutionsCursor.moveToNext();
                             solutionFormat = solutionsCursor.GetSolution();
                         }

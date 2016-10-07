@@ -4,12 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,26 +18,18 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.xmlpull.v1.XmlPullParserException;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class ChislevSubjectPresenterFragments extends Fragment
 {
-    private static final String CONFIG_FILENAME = "config.xml";
-    private static final String CONFIG_URL = "https://raw.githubusercontent.com/Froist/Chislev/master/Data/config.xml";
-
-    private ChislevFileManager mFileManager = null;
     private View mViewLoading;
     private Button mGoOnlineButton;
     private GridView mGridView;
     private ChislevHandlerThread mHandlerThread = null;
 
     static public final int LEVEL_REQUEST_CODE = 1;
-    static private final String TAG = "SubjectPresenterFragments";
-
     private int mSubjectIndex = -1;
     private int mSubjectDifficultyLevel = -1;
 
@@ -49,7 +39,6 @@ public class ChislevSubjectPresenterFragments extends Fragment
         super.onCreate( savedInstanceState );
         getActivity().setTitle( R.string.available_subjects );
 
-        mFileManager = new ChislevFileManager( getActivity() );
         InitializeHandler();
     }
 
@@ -92,7 +81,15 @@ public class ChislevSubjectPresenterFragments extends Fragment
 
     private void LoadStartupConfigFile()
     {
-        new ChislevLoadConfigFileTask().execute();
+        final ChislevUtilities.ChislevLoadConfigFileTask loadConfigFileTask = new ChislevUtilities.ChislevLoadConfigFileTask( getActivity() );
+        loadConfigFileTask.SetUiThreadOnPostExecuteListener( new ChislevUtilities.ChislevLoadConfigFileTask.MainUiThreadListener() {
+            @Override
+            public void UiThreadOnPostExecute( ArrayList<ChislevSubjectInformation> informationList ) {
+                ChislevSubjectsLaboratory.Get( getActivity() ).SetSubjects( informationList );
+                UpdateMainThreadInformation();
+            }
+        });
+        loadConfigFileTask.execute();
     }
 
     @Nullable
@@ -122,8 +119,7 @@ public class ChislevSubjectPresenterFragments extends Fragment
             public void onClick( View v ) {
                 mViewLoading.setVisibility( View.VISIBLE );
                 mGoOnlineButton.setEnabled( false );
-                final ChislevLoadConfigFileTask asyncTask = new ChislevLoadConfigFileTask();
-                asyncTask.execute();
+                LoadStartupConfigFile();
             }
         });
         LoadStartupConfigFile();
@@ -201,51 +197,6 @@ public class ChislevSubjectPresenterFragments extends Fragment
                 }
             }
             return convertView;
-        }
-    }
-
-    private class ChislevLoadConfigFileTask extends AsyncTask<Void, String, ArrayList<ChislevSubjectInformation>>
-    {
-        static final String TAG = "LoadConfigFileTask";
-        @Override
-        protected ArrayList<ChislevSubjectInformation> doInBackground( Void... params )
-        {
-            File file = new File( getActivity().getFilesDir(), CONFIG_FILENAME );
-            String data;
-            ChislevFileManager fileManager = new ChislevFileManager( getActivity() );
-            ArrayList<ChislevSubjectInformation> informationList = new ArrayList<>();
-
-            try {
-                if( !file.exists() ){
-                    byte[] result = new ChislevNetworkManager( getActivity() ).GetData( CONFIG_URL );
-                    if( result == null || result.length == 0 ) return null;
-
-                    fileManager.SaveDataToFile( result, CONFIG_FILENAME, null );
-                    data = ChislevUtilities.ByteArrayToString( result );
-                } else {
-                    data = fileManager.ReadDataFromFile( file.getCanonicalPath() );
-                }
-            } catch ( IOException exception ) {
-                return informationList;
-            }
-            ChislevXMLSerializer xmlSerializer = new ChislevXMLSerializer( getActivity() );
-            try {
-                informationList = xmlSerializer.ParseConfigData( data );
-            } catch ( XmlPullParserException exception ) {
-                Log.d( TAG, "Error parsing the result sent from the network, contact your app admin.\nDetails: "
-                        + exception.getLocalizedMessage(), exception );
-            } catch ( IOException exception ) {
-                Log.d( TAG, "Input/Output error occurred, please contact your app admin.\nDetails: "
-                        + exception.getLocalizedMessage(), exception );
-            }
-            return informationList;
-        }
-
-        @Override
-        protected void onPostExecute( ArrayList<ChislevSubjectInformation> informationList )
-        {
-            ChislevSubjectsLaboratory.Get( getActivity() ).SetSubjects( informationList );
-            UpdateMainThreadInformation();
         }
     }
 

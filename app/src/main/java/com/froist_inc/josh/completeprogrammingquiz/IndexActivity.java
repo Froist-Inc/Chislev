@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -48,14 +47,13 @@ public class IndexActivity extends AppCompatActivity
         mDrawerToggle = new ActionBarDrawerToggle( this, mDrawLayout, toolbar, android.R.string.copy,
                 android.R.string.cancel ){
             @Override
-            public void onDrawerClosed( View drawerView) {
-                getSupportActionBar().setTitle( R.string.app_name );
+            public void onDrawerClosed( View drawerView ) {
                 invalidateOptionsMenu();
             }
 
             @Override
-            public void onDrawerOpened(View drawerView) {
-                getSupportActionBar().setTitle( R.string.menu_item );
+            public void onDrawerOpened( View drawerView )
+            {
                 invalidateOptionsMenu();
             }
         };
@@ -128,27 +126,29 @@ public class IndexActivity extends AppCompatActivity
     {
         boolean drawerOpen = mDrawLayout.isDrawerOpen( mDrawerList );
         menu.findItem( R.id.action_settings ).setVisible( !drawerOpen );
-        return super.onPrepareOptionsMenu(menu);
+        return super.onPrepareOptionsMenu( menu );
     }
 
-    // Todo
     private void selectItem( int position )
     {
         Fragment fragmentToShow = null;
         mPageIndex = position;
         switch ( position ){
-            case 0: // lists of quiz
+            case 0: // list of quiz
                 fragmentToShow = new ChislevSubjectPresenterFragments();
                 break;
+            case 1: // scores
+                fragmentToShow = new ChislevScoresFragment();
+                break;
             // Todo
-            case 1: default:
+            default:
                 break;
         }
         if( fragmentToShow != null ) {
             getSupportFragmentManager().beginTransaction().replace( R.id.drawer_mainLayout, fragmentToShow ).commit();
         }
-        mDrawerList.setItemChecked(position, true);
-        mDrawLayout.closeDrawer(mDrawerList);
+        mDrawerList.setItemChecked( position, true );
+        mDrawLayout.closeDrawer( mDrawerList );
     }
 
     @Override

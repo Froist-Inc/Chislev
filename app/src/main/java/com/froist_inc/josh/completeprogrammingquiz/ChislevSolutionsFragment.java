@@ -32,8 +32,8 @@ public class ChislevSolutionsFragment extends Fragment
     @Override
     public void onSaveInstanceState( Bundle outState )
     {
-        super.onSaveInstanceState( outState );
         outState.putInt( SOLUTION_DISPLAYED_INDEX, mCurrentSolutionDisplayed );
+        super.onSaveInstanceState( outState );
     }
 
     @Nullable

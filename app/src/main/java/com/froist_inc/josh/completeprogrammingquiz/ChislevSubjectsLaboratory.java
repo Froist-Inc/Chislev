@@ -8,12 +8,11 @@ public class ChislevSubjectsLaboratory
 {
     private static ChislevSubjectsLaboratory subjectsLaboratoryInstance;
     private ArrayList<ChislevSubjectInformation> mItems;
-    private final Context mContext;
 
     public static ChislevSubjectsLaboratory Get( Context context )
     {
         if( subjectsLaboratoryInstance == null ){
-            subjectsLaboratoryInstance = new ChislevSubjectsLaboratory( context.getApplicationContext() );
+            subjectsLaboratoryInstance = new ChislevSubjectsLaboratory( context );
         }
         return subjectsLaboratoryInstance;
     }
@@ -33,14 +32,9 @@ public class ChislevSubjectsLaboratory
         mItems = subjects;
     }
 
-    public void AddSubjects( ChislevSubjectInformation subjectInformation )
-    {
-        mItems.add( subjectInformation );
-    }
-
+    @SuppressWarnings( "unused" )
     private ChislevSubjectsLaboratory( Context context )
     {
         mItems = new ArrayList<>();
-        mContext = context;
     }
 }

@@ -11,12 +11,8 @@ import javax.net.ssl.HttpsURLConnection;
 
 class ChislevNetworkManager
 {
-    private final Context mContext;
-    static final String TAG = "ChislevNetworkManager";
-
     ChislevNetworkManager( Context context )
     {
-        mContext = context;
     }
 
     public byte[] GetData( String address ) throws IOException
