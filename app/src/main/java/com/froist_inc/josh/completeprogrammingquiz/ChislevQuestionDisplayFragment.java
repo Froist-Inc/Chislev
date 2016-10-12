@@ -1,15 +1,16 @@
 package com.froist_inc.josh.completeprogrammingquiz;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
@@ -20,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -55,7 +57,6 @@ public class ChislevQuestionDisplayFragment extends Fragment
 
     private WebView mCodeView;
     private TextView mContributorTextView;
-    private TextView mTimerTextView;
     private TextView mQuestionTextView;
     private TextView mQuestionIndexTextView;
 
@@ -65,8 +66,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
     private RadioButton mFourthOptionRadio;
     private EditText mAnswerText;
     private CheckBox mUsingStringCheckbox;
-    private CountDownTimer mCountDownTimer;
-
+    private RadioGroup mCollectiveOptions;
     private View view = null;
 
     Date mTimeStarted, mTimeCompleted;
@@ -88,6 +88,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
         mQuestionIndexTextView.setText( getString( R.string.question_index, ( index + 1 ),
                 ChislevQuestionDisplayActivity.GetQuestionList().size() ) );
         mQuestionTextView.setText( currentQuestion.getQuestion().trim() );
+        mCollectiveOptions.clearCheck();
         mFirstOptionRadio.setText( currentQuestion.getAvailableOptions().get( 0 ));
         mSecondOptionRadio.setText( currentQuestion.getAvailableOptions().get( 1 ));
         mThirdOptionRadio.setText( currentQuestion.getAvailableOptions().get( 2 ));
@@ -158,7 +159,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
             @Override
             public void onClick( View v ) {
                 if( mCurrentQuestionIndex == ChislevQuestionDisplayActivity.GetQuestionList().size() - 1 ){
-                    DoFinalSubmission();
+                    DoFinalSubmission( false );
                 } else {
                     ++mCurrentQuestionIndex;
                     if ( mCurrentQuestionIndex == ChislevQuestionDisplayActivity.GetQuestionList().size() - 1) {
@@ -170,7 +171,6 @@ public class ChislevQuestionDisplayFragment extends Fragment
         });
         mCodeView = ( WebView ) view.findViewById( R.id.question_codeWebView );
         mCodeView.setClickable( true );
-        mTimerTextView = ( TextView ) view.findViewById( R.id.timer_textView );
         mContributorTextView = ( TextView ) view.findViewById( R.id.contributor_textView );
         mQuestionTextView = ( TextView ) view.findViewById( R.id.question_textView );
         mFirstOptionRadio = ( RadioButton ) view.findViewById( R.id.question_option_oneRadioButton );
@@ -178,8 +178,8 @@ public class ChislevQuestionDisplayFragment extends Fragment
         mThirdOptionRadio = ( RadioButton ) view.findViewById( R.id.question_option_threeRadioButton );
         mFourthOptionRadio = ( RadioButton ) view.findViewById( R.id.question_option_fourRadioButton );
 
-        RadioGroup collectiveOptions = ( RadioGroup ) view.findViewById( R.id.radioGroup );
-        collectiveOptions.setOnCheckedChangeListener( new RadioGroup.OnCheckedChangeListener() {
+        mCollectiveOptions = ( RadioGroup ) view.findViewById( R.id.radioGroup );
+        mCollectiveOptions.setOnCheckedChangeListener( new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged( RadioGroup group, int checkedId ) {
                 switch( checkedId ){
@@ -204,18 +204,60 @@ public class ChislevQuestionDisplayFragment extends Fragment
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater ) {
-        inflater.inflate( R.menu.menu_index, menu );
+    public void onCreateOptionsMenu( Menu menu, MenuInflater inflater )
+    {
+        super.onCreateOptionsMenu( menu, inflater );
+        inflater.inflate( R.menu.question_page_menu, menu );
+    }
+
+    @Override
+    public boolean onOptionsItemSelected( MenuItem item )
+    {
+        switch ( item.getItemId() ){
+            case R.id.menu_question_page_forfeit:
+                ProcessForfeiting();
+                return true;
+            case android.R.id.home:
+                if( NavUtils.getParentActivityName( getActivity() ) != null ){
+                    DoFinalSubmission( true );
+                    NavUtils.navigateUpFromSameTask( getActivity() );
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected( item );
+        }
+    }
+
+    private void ProcessForfeiting()
+    {
+        final Dialog confirmExit = new Dialog( getActivity() );
+        confirmExit.setContentView( R.layout.hint_display_fragment );
+        confirmExit.setTitle( R.string.exit_title );
+        ( ( TextView ) confirmExit.findViewById( R.id.text ) ).setText( R.string.confirm_exit );
+        confirmExit.findViewById( R.id.yesButton ).setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick( View v ) {
+                confirmExit.dismiss();
+                DoFinalSubmission( true );
+            }
+        });
+        confirmExit.findViewById( R.id.noButton ).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirmExit.dismiss();
+            }
+        });
+        confirmExit.show();
     }
 
     @Override
     public void onCreate( @Nullable Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
-        setHasOptionsMenu( true );
         setRetainInstance( true );
         mSubjectIndex = getArguments().getInt( EXTRA_INDEX );
         mLevel = getArguments().getInt( EXTRA_LEVEL );
+        setHasOptionsMenu( true );
     }
 
     @Override
@@ -250,66 +292,48 @@ public class ChislevQuestionDisplayFragment extends Fragment
         getLoaderManager().initLoader( 0, null, new LoaderCallbacks() );
         InitializeView();
 
-        final int thirtySeconds = 30000, timeElapsed = thirtySeconds * questionList.size(), oneSecond = 1000;
-        if( mCountDownTimer == null ) {
-            mCountDownTimer = new CountDownTimer( timeElapsed, oneSecond ) {
-                @Override
-                public void onTick( long millisUntilFinished ) {
-                    long x = millisUntilFinished / 1000;
-                    long seconds = x % 60;
-                    x /= 60;
-                    int minutes = ( int ) x % 60;
-                    x /= 60;
-                    int hours = ( int ) x % 24;
-                    String text = "" + ( hours > 0 ? (hours + "h") : "" ) +
-                            ( minutes > 0 ? ( minutes + "m" ) : "" ) +
-                            seconds + "s";
-                    mTimerTextView.setText(text);
-                }
-
-                @Override
-                public void onFinish() {
-                    DoFinalSubmission();
-                }
-            };
-            mCountDownTimer.start();
-        }
         mTimeStarted = new Date();
         UpdateQuestionView( mCurrentQuestionIndex );
     }
 
-    private void DoFinalSubmission()
+    private void DoFinalSubmission( boolean forfeited )
     {
-        mCountDownTimer.cancel();
         mTimeCompleted = new Date();
-        final ArrayList<ChislevQuestion> questionList = ChislevQuestionDisplayActivity.GetQuestionList();
-        final ArrayList<ChislevQuestion.ChislevSolutionFormat> solutionList = ChislevQuestionDisplayActivity.GetSolutionList();
-
         int totalScore = 0;
-        for( int i = 0; i != questionList.size(); ++i ){
-            ChislevQuestion currentQuestion = questionList.get( i );
-            ChislevQuestion.ChislevSolutionFormat currentGottenSolution = solutionList.get( i );
 
-            final String answer = currentQuestion.getAnswer() == null ? "" : currentQuestion.getAnswer();
-            if( currentQuestion.getChosenOption() == currentGottenSolution.getCorrectOption() ){
-                if( currentGottenSolution.getCorrectText().equals( answer ) ){
-                    currentGottenSolution.setIsCorrect();
-                    ++totalScore;
+        if( !forfeited ) {
+            final ArrayList<ChislevQuestion> questionList = ChislevQuestionDisplayActivity.GetQuestionList();
+            final ArrayList<ChislevQuestion.ChislevSolutionFormat> solutionList = ChislevQuestionDisplayActivity.GetSolutionList();
+
+            for ( int i = 0; i != questionList.size(); ++i ) {
+                ChislevQuestion currentQuestion = questionList.get(i);
+                ChislevQuestion.ChislevSolutionFormat currentGottenSolution = solutionList.get(i);
+
+                final String answer = currentQuestion.getAnswer() == null ? "" : currentQuestion.getAnswer();
+                if ( currentQuestion.getChosenOption() == currentGottenSolution.getCorrectOption() ) {
+                    if ( currentGottenSolution.getCorrectText().equals( answer ) ) {
+                        currentGottenSolution.setIsCorrect();
+                        ++totalScore;
+                    }
                 }
             }
+            new AlertDialog.Builder(this.getContext())
+                    .setMessage( R.string.display_solution_message)
+                    .setTitle(R.string.display_solution_title).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if ( dialog != null ) {
+                        dialog.dismiss();
+                    }
+                }
+            }).show();
         }
-        new AlertDialog.Builder( this.getContext() )
-                .setMessage( R.string.display_solution_message )
-                .setTitle( R.string.display_solution_title ).setPositiveButton( android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick( DialogInterface dialog, int which ) {
-                if ( dialog != null ) {
-                    dialog.dismiss();
-                }
-            }
-        }).show();
         RecordScores( totalScore );
-        ( ( ChislevQuestionDisplayActivity ) getActivity() ).FragmentWorkCompleted();
+        if( forfeited ) {
+            getActivity().finish();
+        } else {
+            (( ChislevQuestionDisplayActivity ) getActivity() ).FragmentWorkCompleted();
+        }
     }
 
     public String LevelToString( final int level )

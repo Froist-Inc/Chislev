@@ -54,7 +54,7 @@ public class ChislevAbstractDatabaseManager extends SQLiteOpenHelper
     {
         private final String DB_NAME = ChislevSubjectInformation.SOLUTION_FILENAME;
         private SQLiteDatabase mDatabase;
-        private String mTableName;
+        private final String mTableName;
         private ChislevAbstractDatabaseManager mDatabaseManager;
 
         ChislevAbstractDatabaseHelper( String tableName )

@@ -8,6 +8,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -114,9 +115,10 @@ public class IndexActivity extends AppCompatActivity
             if( position == 0 ){
                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams( RelativeLayout.LayoutParams.WRAP_CONTENT,
                         RelativeLayout.LayoutParams.WRAP_CONTENT );
-                layoutParams.setMargins( 10, 100, 0, 10 );
+                layoutParams.setMargins( 10, 70, 10, 10 );
                 textView.setLayoutParams( layoutParams );
             }
+
             return convertView;
         }
     }
@@ -139,6 +141,9 @@ public class IndexActivity extends AppCompatActivity
                 break;
             case 1: // scores
                 fragmentToShow = new ChislevScoresFragment();
+                break;
+            case 2: // contribution
+                fragmentToShow = new ChislevContributionFragment();
                 break;
             // Todo
             default:

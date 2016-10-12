@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class ChislevHintDisplayDialog extends android.support.v4.app.DialogFragment
 {
@@ -29,6 +30,8 @@ public class ChislevHintDisplayDialog extends android.support.v4.app.DialogFragm
                 dialog.dismiss();
             }
         });
+        TextView promptMessage = ( TextView ) dialog.findViewById( R.id.text );
+        promptMessage.setText( R.string.show_hint_confirmation );
         Button noButton = ( Button ) dialog.findViewById( R.id.noButton );
         noButton.setOnClickListener( new View.OnClickListener() {
             @Override

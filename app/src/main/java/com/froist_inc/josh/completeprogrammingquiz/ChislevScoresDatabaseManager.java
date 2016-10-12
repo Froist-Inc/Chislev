@@ -80,7 +80,7 @@ public class ChislevScoresDatabaseManager extends ChislevAbstractDatabaseManager
 
     public static class ChislevScoresCursorLoader extends ChislevAbstractCursorLoader
     {
-        private String mId;
+        private final String mId;
 
         ChislevScoresCursorLoader( Context context, String[] tableColumns, final String code )
         {

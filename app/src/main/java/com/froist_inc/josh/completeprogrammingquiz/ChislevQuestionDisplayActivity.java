@@ -6,24 +6,18 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class ChislevQuestionDisplayActivity extends AppCompatActivity
 {
-    private static final String TAG = "QuestionDisplayActivity";
-
     private static ArrayList<ChislevQuestion> questionList;
     private static ArrayList<ChislevQuestion.ChislevSolutionFormat> solutionList;
     private static final String FRAG = "CurrentFragment";
-    private static final String EXTRA_INDEX = "EXTRA_INDEX", EXTRA_LEVEL = "EXTRA_LEVEL", EXTRA = "EXTRA_DATA";
-
+    private static final String EXTRA_INDEX = "EXTRA_INDEX", EXTRA_LEVEL = "EXTRA_LEVEL";
     private int currentFragment = 0;
 
     private int mSubjectLevel, mSubjectIndex;
@@ -58,7 +52,7 @@ public class ChislevQuestionDisplayActivity extends AppCompatActivity
             fragmentManager.beginTransaction().add( containerID, fragment ).commit();
         }
 
-        Toolbar toolbar = ( Toolbar ) findViewById( R.id.question_toolbar );
+        Toolbar toolbar = ( Toolbar) findViewById( R.id.question_toolbar );
         setSupportActionBar( toolbar );
 
         getSupportActionBar().setDisplayHomeAsUpEnabled( true );
@@ -66,31 +60,10 @@ public class ChislevQuestionDisplayActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onSaveInstanceState( Bundle outState ) {
+    protected void onSaveInstanceState( Bundle outState )
+    {
         outState.putInt( FRAG, currentFragment );
         super.onSaveInstanceState( outState );
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu( Menu menu )
-    {
-        getMenuInflater().inflate( R.menu.question_page_menu, menu );
-        return super.onCreateOptionsMenu( menu );
-    }
-
-    @Override
-    public boolean onOptionsItemSelected( MenuItem item ) {
-        switch ( item.getItemId() ){
-            case R.id.menu_question_page_forfeit:
-                return true;
-            case android.R.id.home:
-                if( NavUtils.getParentActivityName( this ) != null ){
-                    NavUtils.navigateUpFromSameTask( this );
-                }
-                return true;
-            default:
-                return super.onOptionsItemSelected( item );
-        }
     }
 
     public Fragment GetFragment()

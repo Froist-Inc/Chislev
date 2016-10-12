@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Complete Programming Quiz</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_check_update">Check for update</string>
     <string name="fetch_questions">Fetch questions online</string>
     <string name="index_activity_loading">Just a moment, please&#8230;</string>
     <string name="question_contributor">Question contributed by: %1$s </string>
@@ -16,12 +16,11 @@
     <string name="next">Next</string>
     <string name="submit_text">Finish</string>
     <string name="contributor_text">Contributor</string>
-    <string name="timer_display">Timer display</string>
-    <string name="menu_item">Actions</string>
     <string name="difficulty_level_title"> Difficulty level</string>
     <string name="use_text_box">Use input text?</string>
     <string name="take_quiz"> New Quiz </string>
     <string name="scores">Scores</string>
+    <string name="view_scores_text">Would you like to view your scores?</string>
     <string name="contribute">Contribute</string>
     <string name="attributes">Appreciation</string>
     <string name="question_number"> Question %1$d </string>
@@ -29,10 +28,28 @@
     <string name="reason">Reason</string>
     <string name="correct">Correct!</string>
     <string name="wrong">Wrong!</string>
-    <string name="question_index"> Question %1$d of %2$d.</string>
+    <string name="exit_title">Exit</string>
+    <string name="confirm_exit">Are you sure you want to exit?</string>
+    <string name="question_index"> Question %1$d of %2$d</string>
 
-    <string name="score_level_text"> Difficulty level: %1$s.</string>
-    <string name="score_day_taken_text">Quiz was taken on: %1$s, %2$s.</string>
-    <string name="score_total_text">Scored %1$d out of %2$d questions.</string>
-    <string name="score_time_used_text">Time used: %1$s.</string>
+    <string name="score_level_text"> Difficulty level: %1$s</string>
+    <string name="score_day_taken_text">Quiz was taken on: %1$s, %2$s</string>
+    <string name="score_total_text">Scored %1$d out of %2$d questions</string>
+    <string name="score_time_used_text">Time used: %1$s</string>
+
+    <string name="fill_empty_blanks">Make sure all non-optional input texts are filled.</string>
+    <string name="source_code">Source code</string>
+    <string name="send">Send</string>
+    <string name="option_1">Option 1</string>
+    <string name="option_2">Option 2</string>
+    <string name="option_3">Option 3</string>
+    <string name="option_4">Option 4</string>
+    <string name="available_options">Available Options</string>
+    <string name="email">Your name( optional )</string>
+    <string name="explanation">Explanation</string>
+    <string name="subject_name">Subject name e.g C++, Python, Java etc</string>
+    <string name="hint_text">If the user wants an hint, what is to show?</string>
+    <string name="question">Enter question here e.g. What is the output of the code below? </string>
+    <string name="difficulty_level_text"> Difficulty( Beginner/Intermediate/Hard ) </string>
+    <string name="input"> ( Optional ) Any specific output? What is it? </string>
 </resources>

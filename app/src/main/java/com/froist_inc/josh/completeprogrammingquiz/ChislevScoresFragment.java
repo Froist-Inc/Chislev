@@ -23,7 +23,7 @@ import java.util.Map;
 public class ChislevScoresFragment extends Fragment {
     private ArrayList<ChislevSubjectInformation> mInformationList;
     private ExpandableListView mExpandableListView;
-    Map<String, ArrayList<ChislevScoresFormat>> mScoreMap =
+    final Map<String, ArrayList<ChislevScoresFormat>> mScoreMap =
             Collections.synchronizedMap( new HashMap<String, ArrayList<ChislevScoresFormat>>() );
 
     @Nullable
@@ -61,8 +61,9 @@ public class ChislevScoresFragment extends Fragment {
         }
     }
 
-    private class ScoresLoaderCallback implements LoaderManager.LoaderCallbacks<Cursor> {
-        private String[] tableColumns = new String[]{
+    private class ScoresLoaderCallback implements LoaderManager.LoaderCallbacks<Cursor>
+    {
+        private final String[] tableColumns = new String[]{
                 ChislevScoresFormat.LEVEL, ChislevScoresFormat.TIME_STARTED, ChislevScoresFormat.TIME_USED,
                 ChislevScoresFormat.DAY_QUIZ_TAKEN, ChislevScoresFormat.TOTAL_SCORE, ChislevScoresFormat.QUESTION_ARITY
         };
@@ -90,7 +91,7 @@ public class ChislevScoresFragment extends Fragment {
 
     private class ResultStoringThread extends Thread
     {
-        private ChislevScoresDatabaseManager.ScoresExtractingCursor mDataCursor;
+        private final ChislevScoresDatabaseManager.ScoresExtractingCursor mDataCursor;
         private final String mDataId;
 
         ResultStoringThread( final Loader<Cursor> loader, final Cursor data )
@@ -133,10 +134,10 @@ public class ChislevScoresFragment extends Fragment {
 
     private class ExpandableScoreAdapter extends BaseExpandableListAdapter
     {
-        private ArrayList<String> mHeaders;
-        private ArrayList<String> mDisplayHeaders;
-        private Map<String, ArrayList<ChislevScoresFormat>> mData;
-        private Context mContext;
+        private final ArrayList<String> mHeaders;
+        private final ArrayList<String> mDisplayHeaders;
+        private final Map<String, ArrayList<ChislevScoresFormat>> mData;
+        private final Context mContext;
 
         ExpandableScoreAdapter( Context context, ArrayList<String> headers,
                                 Map<String, ArrayList<ChislevScoresFormat>> data)
