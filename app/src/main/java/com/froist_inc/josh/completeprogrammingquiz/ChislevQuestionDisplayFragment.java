@@ -161,11 +161,15 @@ public class ChislevQuestionDisplayFragment extends Fragment
                 if( mCurrentQuestionIndex == ChislevQuestionDisplayActivity.GetQuestionList().size() - 1 ){
                     DoFinalSubmission( false );
                 } else {
-                    ++mCurrentQuestionIndex;
-                    if ( mCurrentQuestionIndex == ChislevQuestionDisplayActivity.GetQuestionList().size() - 1) {
-                        nextQuestionButton.setText(getString(R.string.submit_text));
+                    if( !IsCorrectAnswer() ){
+                        DoFinalSubmission( false );
+                    } else {
+                        ++mCurrentQuestionIndex;
+                        if (mCurrentQuestionIndex == ChislevQuestionDisplayActivity.GetQuestionList().size() - 1) {
+                            nextQuestionButton.setText(getString(R.string.submit_text));
+                        }
+                        UpdateQuestionView(mCurrentQuestionIndex);
                     }
-                    UpdateQuestionView(mCurrentQuestionIndex);
                 }
             }
         });
@@ -201,6 +205,22 @@ public class ChislevQuestionDisplayFragment extends Fragment
                 }
             }
         });
+    }
+
+    private boolean IsCorrectAnswer()
+    {
+        ChislevQuestion currentQuestion = ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex );
+        ChislevQuestion.ChislevSolutionFormat currentGottenSolution = ChislevQuestionDisplayActivity.GetSolutionList()
+                .get( mCurrentQuestionIndex );
+
+        final String answer = currentQuestion.getAnswer() == null ? "" : currentQuestion.getAnswer();
+        if ( currentQuestion.getChosenOption() == currentGottenSolution.getCorrectOption() ) {
+            if ( currentGottenSolution.getCorrectText().equals( answer ) ) {
+                currentGottenSolution.setIsCorrect();
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -264,12 +284,12 @@ public class ChislevQuestionDisplayFragment extends Fragment
     public void onActivityResult( int requestCode, int resultCode, Intent data )
     {
         super.onActivityResult( requestCode, resultCode, data );
+        final String hint = ChislevQuestionDisplayActivity.GetSolutionList().get( mCurrentQuestionIndex ).getHint();
         if( requestCode == ChislevQuestionDisplayFragment.HINT_CHECK ) {
             if ( resultCode == Activity.RESULT_OK ) {
                 ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).setHintUsed();
                 new AlertDialog.Builder( getActivity() ).setTitle( R.string.hint )
-                        .setMessage( ChislevQuestionDisplayActivity.GetQuestionList().get( mCurrentQuestionIndex ).getHint() )
-                        .setPositiveButton( android.R.string.ok, null ).show();
+                        .setMessage( hint ).setPositiveButton( android.R.string.ok, null ).show();
             }
             Fragment hintDialogFragment = getActivity().getSupportFragmentManager()
                     .findFragmentByTag( ChislevHintDisplayDialog.TAG );
@@ -299,7 +319,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
     private void DoFinalSubmission( boolean forfeited )
     {
         mTimeCompleted = new Date();
-        int totalScore = 0;
+        double totalScore = 0;
 
         if( !forfeited ) {
             final ArrayList<ChislevQuestion> questionList = ChislevQuestionDisplayActivity.GetQuestionList();
@@ -313,7 +333,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
                 if ( currentQuestion.getChosenOption() == currentGottenSolution.getCorrectOption() ) {
                     if ( currentGottenSolution.getCorrectText().equals( answer ) ) {
                         currentGottenSolution.setIsCorrect();
-                        ++totalScore;
+                        totalScore += ( currentQuestion.isHintUsed() ? 0.5 : 1.0 );
                     }
                 }
             }
@@ -332,7 +352,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
         if( forfeited ) {
             getActivity().finish();
         } else {
-            (( ChislevQuestionDisplayActivity ) getActivity() ).FragmentWorkCompleted();
+            (( ChislevQuestionDisplayActivity ) getActivity() ).FragmentWorkCompleted( mCurrentQuestionIndex + 1 );
         }
     }
 
@@ -350,7 +370,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
         }
     }
 
-    private void RecordScores( final int totalScore )
+    private void RecordScores( final double totalScore )
     {
         final ChislevScoresFormat score = new ChislevScoresFormat();
         final java.text.DateFormat dateFormat = DateFormat.getDateFormat( getActivity() ),
@@ -370,7 +390,8 @@ public class ChislevQuestionDisplayFragment extends Fragment
         executorService.execute( new Runnable() {
             @Override
             public void run() {
-                boolean success = ChislevScoresDatabaseManager.InsertNewScore( getActivity(), score, code );
+                String cjsm = ChislevSubjectsLaboratory.Get( getActivity() ).GetSubjectItem( mSubjectIndex ).getCurrentSubjectChecksum();
+                boolean success = ChislevScoresDatabaseManager.InsertNewScore( getActivity(), score, code, cjsm );
                 Log.d( TAG, success ? "Succeeded!" : "Failed" );
             }
         });
@@ -446,14 +467,15 @@ public class ChislevQuestionDisplayFragment extends Fragment
         @SuppressWarnings( "unchecked" )
         @Override
         public Loader onCreateLoader( int id, Bundle args ) {
-            final String subjectCode = ChislevSubjectsLaboratory.Get( getActivity()).GetSubjectItem( mSubjectIndex)
+            final String subjectCode = ChislevSubjectsLaboratory.Get( getActivity() ).GetSubjectItem( mSubjectIndex)
                     .getSubjectCode();
             final ArrayList<ChislevQuestion> questionList = ChislevQuestionDisplayActivity.GetQuestionList();
             String[] referenceIds = new String[questionList.size()];
             for (int i = 0; i != questionList.size(); ++i) {
                 referenceIds[i] = questionList.get( i ).getReferenceID();
             }
-            return new ChislevDatabaseManager.ChislevCursorLoader( getActivity(), referenceIds, subjectCode );
+            final String subjectUpdateMd5Checksum = ChislevSubjectsLaboratory.Get( getActivity() ).GetSubjectItem( mSubjectIndex ).getCurrentSubjectChecksum();
+            return new ChislevDatabaseManager.ChislevCursorLoader( getActivity(), referenceIds, subjectCode, subjectUpdateMd5Checksum );
         }
 
         @SuppressWarnings( "unchecked" )

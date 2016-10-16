@@ -81,14 +81,14 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="@string/reason" />
 
-            <TextView
+            <WebView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp"
-                android:id="@+id/reason_show_textView" />
+                android:id="@+id/reason_show_webView" />
             <!-- This button only allocate enough space for all @id/reason_show_textView's text to be visible -->
             <Button
                 android:visibility="invisible"

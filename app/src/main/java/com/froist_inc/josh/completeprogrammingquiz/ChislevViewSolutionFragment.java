@@ -57,8 +57,9 @@ public class ChislevViewSolutionFragment extends Fragment
         TextView correctAnswerTextView = ( TextView ) view.findViewById( R.id.correct_answer_textView );
         correctAnswerTextView.setText( answerString );
 
-        TextView reasonShowTextView = ( TextView ) view.findViewById( R.id.reason_show_textView );
-        reasonShowTextView.setText( mQuestion.getExplanation() );
+        WebView reasonShowWebView = ( WebView ) view.findViewById( R.id.reason_show_webView );
+        reasonShowWebView.loadData( mSolution.getExplanation(), "text/html", "UTF-8" );
+        reasonShowWebView.reload();
         return view;
     }
 

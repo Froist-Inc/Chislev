@@ -11,7 +11,7 @@ public class ChislevScoresDatabaseManager extends ChislevAbstractDatabaseManager
     final static String TableCreationQuery = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "( " +
             ChislevScoresFormat.LEVEL + " text, " + ChislevScoresFormat.TIME_STARTED + " text, " +
             ChislevScoresFormat.TIME_USED + " text, " + ChislevScoresFormat.DAY_QUIZ_TAKEN +
-            " text, " + ChislevScoresFormat.TOTAL_SCORE + " INTEGER, "
+            " text, " + ChislevScoresFormat.TOTAL_SCORE + " REAL, "
             + ChislevScoresFormat.QUESTION_ARITY + " INTEGER )";
 
     ChislevScoresDatabaseManager( Context context, final String dbName )
@@ -68,7 +68,7 @@ public class ChislevScoresDatabaseManager extends ChislevAbstractDatabaseManager
 
             final ChislevScoresFormat score = new ChislevScoresFormat();
             score.setQuizLevelTaken( getString( getColumnIndex( ChislevScoresFormat.LEVEL ) ) );
-            score.setTotalScores( getInt( getColumnIndex( ChislevScoresFormat.TOTAL_SCORE )) );
+            score.setTotalScores( getDouble( getColumnIndex( ChislevScoresFormat.TOTAL_SCORE )) );
             score.setQuestionTotal( getInt( getColumnIndex( ChislevScoresFormat.QUESTION_ARITY ) ) );
             score.setDayQuizTaken( getString( getColumnIndex( ChislevScoresFormat.DAY_QUIZ_TAKEN ) ) );
             score.setTimeStarted( getString( getColumnIndex( ChislevScoresFormat.TIME_STARTED )) );
@@ -82,9 +82,9 @@ public class ChislevScoresDatabaseManager extends ChislevAbstractDatabaseManager
     {
         private final String mId;
 
-        ChislevScoresCursorLoader( Context context, String[] tableColumns, final String code )
+        ChislevScoresCursorLoader( Context context, String[] tableColumns, final String code, final String checksum )
         {
-            super( context, tableColumns, code );
+            super( context, tableColumns, code, checksum );
             mId = code;
         }
 
@@ -98,7 +98,7 @@ public class ChislevScoresDatabaseManager extends ChislevAbstractDatabaseManager
     }
 
     synchronized static
-    public boolean InsertNewScore( Context context, final ChislevScoresFormat score, final String code )
+    public boolean InsertNewScore( Context context, final ChislevScoresFormat score, final String code, final String checksum )
     {
         ContentValues cv = new ContentValues();
         cv.put( ChislevScoresFormat.LEVEL, score.getQuizLevelTaken() );
@@ -109,7 +109,7 @@ public class ChislevScoresDatabaseManager extends ChislevAbstractDatabaseManager
         cv.put( ChislevScoresFormat.QUESTION_ARITY, score.getQuestionTotal() );
 
         ChislevScoresDatabaseHelper databaseHelper = new ChislevScoresDatabaseHelper();
-        boolean success = databaseHelper.OpenDatabase( context, code );
+        boolean success = databaseHelper.OpenDatabase( context, code, checksum );
         if( !success ){
             databaseHelper.close();
             return false;

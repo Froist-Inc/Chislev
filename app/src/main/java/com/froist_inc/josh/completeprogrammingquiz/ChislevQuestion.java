@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 class ChislevQuestion
 {
-    private String mExplanation;
-    private String mHint;
     private String mOwner;
     private String mQuestion;
     private ArrayList<String> mAvailableOptions;
@@ -32,9 +30,9 @@ class ChislevQuestion
         usingInputbox = value;
     }
 
-    public boolean isUsingInputbox()
+    public boolean isHintUsed()
     {
-        return usingInputbox;
+        return mHintUsed;
     }
 
     public void setChosenOption( int mChosenOption ) {
@@ -91,22 +89,6 @@ class ChislevQuestion
         this.mAvailableOptions = mAvailableOptions;
     }
 
-    public String getHint() {
-        return mHint;
-    }
-
-    public void setHint( String mHint ) {
-        this.mHint = mHint;
-    }
-
-    public String getExplanation() {
-        return mExplanation;
-    }
-
-    public void setExplanation( final String explanation ) {
-        mExplanation = explanation;
-    }
-
     public String getReferenceID() {
         return mReferenceID;
     }
@@ -119,13 +101,17 @@ class ChislevQuestion
     public static class ChislevSolutionFormat
     {
         private final long mCorrectOption;
+        private final long mReferenceId;
         private final String mCorrectText;
+        private String mExplanation;
+        private String mHint;
 
         private boolean isCorrect = false;
 
-        ChislevSolutionFormat( final long correctOption, final String correctText )
+        ChislevSolutionFormat( final long referenceId, final long correctOption, final String correctText )
         {
             mCorrectOption = correctOption;
+            mReferenceId = referenceId;
             mCorrectText = correctText;
         }
 
@@ -136,6 +122,26 @@ class ChislevQuestion
         public boolean IsCorrect(){ return isCorrect; }
         public String getCorrectText() {
             return mCorrectText;
+        }
+        public long getReferenceId() { return mReferenceId; }
+
+        public void setHint( final String hint )
+        {
+            mHint = hint;
+        }
+        public String getHint()
+        {
+            return mHint;
+        }
+
+        public void setExplanation( final String explanation )
+        {
+            mExplanation = explanation;
+        }
+
+        public String getExplanation()
+        {
+            return mExplanation;
         }
     }
 }

@@ -2,9 +2,10 @@ package com.froist_inc.josh.completeprogrammingquiz;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
+import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteException;
+import net.sqlcipher.database.SQLiteOpenHelper;
+
 import android.support.v4.content.AsyncTaskLoader;
 
 import java.io.File;
@@ -17,6 +18,7 @@ public class ChislevAbstractDatabaseManager extends SQLiteOpenHelper
     ChislevAbstractDatabaseManager( Context context, final String dbName )
     {
         super( context, dbName, null, 1 );
+        SQLiteDatabase.loadLibs( context );
     }
 
     @Override
@@ -27,18 +29,16 @@ public class ChislevAbstractDatabaseManager extends SQLiteOpenHelper
     @Override
     public void onCreate( SQLiteDatabase db )
     {
-
     }
 
-    protected boolean OpenDatabase( final String fullPath )
+    protected boolean OpenDatabase( final String fullPath, final String password )
     {
         try {
-            mDatabase = SQLiteDatabase.openDatabase( fullPath, null, SQLiteDatabase.OPEN_READWRITE );
+            mDatabase = SQLiteDatabase.openDatabase( fullPath, password, null, SQLiteDatabase.OPEN_READWRITE );
         } catch ( SQLiteException exception ){
             return false;
         }
-        boolean mDatabaseIsNull = ( mDatabase == null );
-        return !mDatabaseIsNull;
+        return true;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class ChislevAbstractDatabaseManager extends SQLiteOpenHelper
             }
         }
 
-        protected boolean OpenDatabase( Context context, final String path )
+        protected boolean OpenDatabase( Context context, final String path, final String password )
         {
             String fullPath = GetFullDbPath( context, path );
             if( fullPath == null ){
@@ -82,12 +82,12 @@ public class ChislevAbstractDatabaseManager extends SQLiteOpenHelper
             }
 
             mDatabaseManager = GetDataManager( context, fullPath );
-            boolean success = mDatabaseManager.OpenDatabase( fullPath );
+            boolean success = mDatabaseManager.OpenDatabase( fullPath, password );
             if( !success ) return false;
 
             try {
                 mDatabaseManager.close();
-                mDatabase = mDatabaseManager.getReadableDatabase();
+                mDatabase = mDatabaseManager.getReadableDatabase( password );
                 return true;
             } catch ( SQLiteException exception ){
                 return false;
@@ -113,15 +113,17 @@ public class ChislevAbstractDatabaseManager extends SQLiteOpenHelper
         private final Context mContext;
         private final String[] mList;
         private final String mCode;
+        private final String mChecksum;
 
         private Cursor mCursor;
 
-        public ChislevAbstractCursorLoader( Context context, String[] list, final String code )
+        public ChislevAbstractCursorLoader( Context context, String[] list, final String code, final String checksum )
         {
             super( context );
             mContext = context;
             mList = list;
             mCode = code;
+            mChecksum = checksum;
         }
 
         public abstract ChislevAbstractDatabaseHelper GetDatabaseHelper();
@@ -130,14 +132,14 @@ public class ChislevAbstractDatabaseManager extends SQLiteOpenHelper
         public Cursor loadInBackground()
         {
             ChislevAbstractDatabaseHelper dbHelper = GetDatabaseHelper();
-            boolean success = dbHelper.OpenDatabase( mContext, mCode );
+            boolean success = dbHelper.OpenDatabase( mContext, mCode, mChecksum );
             if( !success ){
                 dbHelper.close();
                 return null;
             }
             try {
-                mCursor = dbHelper.GetCursor(mList);
-                if (mCursor != null) {
+                mCursor = dbHelper.GetCursor( mList );
+                if ( mCursor != null ) {
                     mCursor.getCount();
                 }
             } catch ( Exception except ){

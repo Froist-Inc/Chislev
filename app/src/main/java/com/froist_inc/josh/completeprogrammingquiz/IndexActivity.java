@@ -8,7 +8,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -71,12 +70,6 @@ public class IndexActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu( Menu menu ){
-        getMenuInflater().inflate( R.menu.menu_index, menu );
-        return super.onCreateOptionsMenu( menu );
-    }
-
-    @Override
     public boolean onOptionsItemSelected( MenuItem item ) {
         return mDrawerToggle.onOptionsItemSelected( item ) || super.onOptionsItemSelected( item );
     }
@@ -87,6 +80,11 @@ public class IndexActivity extends AppCompatActivity
         public void onItemClick( AdapterView<?> parent, View view, int position, long id ){
             selectItem( position );
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu( Menu menu ) {
+        return super.onCreateOptionsMenu(menu);
     }
 
     private class DrawerInternalLayoutAdapter extends ArrayAdapter<String>
@@ -127,7 +125,10 @@ public class IndexActivity extends AppCompatActivity
     public boolean onPrepareOptionsMenu( Menu menu )
     {
         boolean drawerOpen = mDrawLayout.isDrawerOpen( mDrawerList );
-        menu.findItem( R.id.action_settings ).setVisible( !drawerOpen );
+        MenuItem menuItem = menu.findItem( R.id.action_settings );
+        if( menuItem != null ) {
+            menuItem.setVisible(!drawerOpen);
+        }
         return super.onPrepareOptionsMenu( menu );
     }
 
@@ -145,7 +146,6 @@ public class IndexActivity extends AppCompatActivity
             case 2: // contribution
                 fragmentToShow = new ChislevContributionFragment();
                 break;
-            // Todo
             default:
                 break;
         }

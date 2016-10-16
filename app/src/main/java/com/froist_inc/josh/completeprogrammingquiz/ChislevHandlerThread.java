@@ -70,8 +70,10 @@ class ChislevHandlerThread extends HandlerThread
             }
             GrabData( subject.getSubjectDataUrl(), subject.getSubjectCode(), subject.getSubjectFilename() );
             GrabData( subject.getSubjectSolutionDBUrl(), subject.getSubjectCode(), ChislevSubjectInformation.SOLUTION_FILENAME );
-            GrabData( subject.getSubjectDetailsCheckSums(), subject.getSubjectCode(), ChislevSubjectInformation.CHECKSUM_FILENAME );
             GrabData( subject.getSubjectIconUrl(), subject.getSubjectCode(), ChislevSubjectInformation.ICON_FILENAME );
+            GrabData( subject.getSubjectDetailsFilename(), subject.getSubjectCode(), ChislevSubjectInformation.CHECKSUM_FILENAME );
+            String checksum = GetSubjectChecksum( subject.getSubjectCode(), ChislevSubjectInformation.CHECKSUM_FILENAME );
+            subject.setCurrentSubjectChecksum( checksum );
 
             subject.setIsAllSet( true );
             /* In case the handler itself or the looper associated with the handler is destroyed, don't do nothing. */
@@ -90,6 +92,11 @@ class ChislevHandlerThread extends HandlerThread
         } finally {
             mData.remove( subject );
         }
+    }
+
+    private String GetSubjectChecksum( final String directory, final String checksumFilename )
+    {
+        return new ChislevXMLSerializer( mContext ).GetSubjectDetailChecksum( directory, checksumFilename );
     }
 
     public void Prepare( final ChislevSubjectInformation subjectInformation )

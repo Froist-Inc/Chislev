@@ -23,13 +23,15 @@ class ChislevDatabaseManager extends ChislevAbstractDatabaseManager
         }
 
         @Override
-        protected ChislevAbstractDatabaseManager GetDataManager( Context context, String fullPath ) {
+        protected ChislevAbstractDatabaseManager GetDataManager( Context context, String fullPath )
+        {
             return new ChislevDatabaseManager( context, fullPath );
         }
 
         private Cursor GetSolutionCursor( String[] referenceIdList )
         {
-            final String query = "SELECT option, answer_text FROM " + super.GetTableName() + " WHERE reference_id IN ( ";
+            final String query = "SELECT reference_id, option, answer_text, hint, explanation FROM "
+                    + super.GetTableName() + " WHERE reference_id IN ( ";
             StringBuilder sqlInExpression = new StringBuilder( query );
             final int listSize = referenceIdList.length - 1;
             for( int i = 0; i != listSize; ++i ) {
@@ -54,17 +56,24 @@ class ChislevDatabaseManager extends ChislevAbstractDatabaseManager
         {
             if( isBeforeFirst() || isAfterLast() ) return null;
 
-            final long correctOption = getLong( getColumnIndex( "option" ) );
-            final String correctText = getString( getColumnIndex( "answer_text" ) );
-            return new ChislevQuestion.ChislevSolutionFormat( correctOption, correctText );
+            final long referenceId = getLong( getColumnIndex( "reference_id" ) ),
+                    correctOption = getLong( getColumnIndex( "option" ) );
+            final String correctText = getString( getColumnIndex( "answer_text" ) ),
+                    hintText = getString( getColumnIndex( "hint" ) ),
+                    explanationText = getString( getColumnIndex( "explanation" ) );
+            final ChislevQuestion.ChislevSolutionFormat solution =
+                    new ChislevQuestion.ChislevSolutionFormat( referenceId, correctOption, correctText );
+            solution.setExplanation( explanationText );
+            solution.setHint( hintText );
+            return solution;
         }
     }
 
     public static class ChislevCursorLoader extends ChislevAbstractCursorLoader
     {
-        ChislevCursorLoader( Context context, String [] list, final String code )
+        ChislevCursorLoader( Context context, String [] list, final String code, final String checksum )
         {
-            super( context, list, code );
+            super( context, list, code, checksum );
         }
 
         @Override

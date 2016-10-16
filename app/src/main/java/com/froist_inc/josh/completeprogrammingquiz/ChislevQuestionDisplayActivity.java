@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class ChislevQuestionDisplayActivity extends AppCompatActivity
 {
@@ -83,7 +84,7 @@ public class ChislevQuestionDisplayActivity extends AppCompatActivity
         return R.id.subject_choose_layoutContainer;
     }
 
-    public void FragmentWorkCompleted()
+    public void FragmentWorkCompleted( int number )
     {
         currentFragment = 1;
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -93,6 +94,9 @@ public class ChislevQuestionDisplayActivity extends AppCompatActivity
             this.finish();
         }
         ChislevSolutionsFragment solutionsFragment = new ChislevSolutionsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt( ChislevSolutionsFragment.NUMBER_OF_QUESTIONS_ANSWERED, number );
+        solutionsFragment.setArguments( bundle );
         fragmentManager.beginTransaction().replace( GetContainerID(), solutionsFragment ).commit();
     }
 
@@ -114,5 +118,15 @@ public class ChislevQuestionDisplayActivity extends AppCompatActivity
     public static void SetAnswerList( ArrayList<ChislevQuestion.ChislevSolutionFormat> chislevSolutionFormats )
     {
         solutionList = chislevSolutionFormats;
+        /* the database may find the solutions in no specified order; sync their references */
+        for( int i = 0; i != questionList.size(); ++i ){
+            long questionReferenceId = Long.parseLong( questionList.get( i ).getReferenceID() );
+            for( int x = 0; x != solutionList.size(); ++x ){
+                if( solutionList.get( x ).getReferenceId() == questionReferenceId ){
+                    Collections.swap( solutionList, x, i );
+                    break;
+                }
+            }
+        }
     }
 }

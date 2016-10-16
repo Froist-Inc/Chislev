@@ -12,7 +12,10 @@ import android.view.ViewGroup;
 public class ChislevSolutionsFragment extends Fragment
 {
     private int mCurrentSolutionDisplayed;
+    private int mNumberOfQuestionsAnswered;
+
     static final String SOLUTION_DISPLAYED_INDEX = "SOLUTION_INDEX";
+    static final String NUMBER_OF_QUESTIONS_ANSWERED = "ANSWERED_QUESTIONS";
     private ViewPager mViewPager;
 
     @Override
@@ -20,6 +23,7 @@ public class ChislevSolutionsFragment extends Fragment
         super.onCreate( savedInstanceState );
         ChislevQuestionDisplayActivity.GetSolutionList();
         mCurrentSolutionDisplayed = savedInstanceState == null ? 0 : savedInstanceState.getInt( SOLUTION_DISPLAYED_INDEX );
+        mNumberOfQuestionsAnswered = getArguments().getInt( NUMBER_OF_QUESTIONS_ANSWERED );
     }
 
     @Override
@@ -56,7 +60,7 @@ public class ChislevSolutionsFragment extends Fragment
 
             @Override
             public int getCount() {
-                return ChislevQuestionDisplayActivity.GetSolutionList().size();
+                return mNumberOfQuestionsAnswered;
             }
         });
         mViewPager.setCurrentItem( mCurrentSolutionDisplayed );

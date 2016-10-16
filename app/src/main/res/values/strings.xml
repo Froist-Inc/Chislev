@@ -34,7 +34,7 @@
 
     <string name="score_level_text"> Difficulty level: %1$s</string>
     <string name="score_day_taken_text">Quiz was taken on: %1$s, %2$s</string>
-    <string name="score_total_text">Scored %1$d out of %2$d questions</string>
+    <string name="score_total_text">Scored %1$s out of %2$s questions</string>
     <string name="score_time_used_text">Time used: %1$s</string>
 
     <string name="fill_empty_blanks">Make sure all non-optional input texts are filled.</string>

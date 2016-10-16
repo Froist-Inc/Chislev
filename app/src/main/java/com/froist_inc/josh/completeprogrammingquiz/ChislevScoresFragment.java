@@ -71,7 +71,8 @@ public class ChislevScoresFragment extends Fragment {
         @Override
         public Loader<Cursor> onCreateLoader( int id, Bundle args ) {
             final String dataId = mInformationList.get( id ).getSubjectCode();
-            return new ChislevScoresDatabaseManager.ChislevScoresCursorLoader( getActivity(), tableColumns, dataId );
+            return new ChislevScoresDatabaseManager.ChislevScoresCursorLoader( getActivity(), tableColumns, dataId,
+                    ChislevSubjectsLaboratory.Get( getActivity() ).GetSubjectItem( id ).getCurrentSubjectChecksum() );
         }
 
         @Override
@@ -198,8 +199,8 @@ public class ChislevScoresFragment extends Fragment {
             dateTimeTextView.setText( getString( R.string.score_day_taken_text, score.getDayQuizTaken(),
                     score.getTimeStarted() ));
             levelTextView.setText( getString( R.string.score_level_text, score.getQuizLevelTaken() ));
-            scoreTextView.setText( getString( R.string.score_total_text, score.getTotalScores(),
-                    score.getQuestionTotal() ) );
+            scoreTextView.setText( getString( R.string.score_total_text, String.valueOf( score.getTotalScores() ),
+                    String.valueOf( score.getQuestionTotal() ) ) );
             timeUsedTextView.setText( getString( R.string.score_time_used_text, score.getTimeUsed() ) );
             return convertView;
         }

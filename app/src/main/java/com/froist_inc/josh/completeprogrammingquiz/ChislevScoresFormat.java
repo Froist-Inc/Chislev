@@ -13,7 +13,7 @@ public class ChislevScoresFormat
     private String mDayQuizTaken;
     private String mTimeStarted;
     private String mTotalTimeUsed;
-    private int    mTotalScores;
+    private double mTotalScores;
     private int    mQuestionTotal;
 
     public String getQuizLevelTaken() {
@@ -40,11 +40,11 @@ public class ChislevScoresFormat
         mTotalTimeUsed = timeElapsed;
     }
 
-    public int getTotalScores() {
+    public double getTotalScores() {
         return mTotalScores;
     }
 
-    public void setTotalScores( int totalScores ) {
+    public void setTotalScores( final double totalScores ) {
         mTotalScores = totalScores;
     }
 

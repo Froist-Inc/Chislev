@@ -12,7 +12,8 @@ public class ChislevSubjectInformation
     private String mSubjectFilename = null;
     private String mSubjectSolutionDBUrl = null;
     private String mSubjectIconUrl = null;
-    private String mSubjectDetailsCheckSums = null;
+    private String mSubjectDetailsFilename = null;
+    private String mCurrentSubjectChecksum = null;
 
     private boolean mIsAllSet = false;
     private String mIconFilename = null;
@@ -24,17 +25,17 @@ public class ChislevSubjectInformation
      * @param dataUrl name of the URL containing the resource for `name`
      * @param solutionDbUrl url leading to the solution's database online
      * @param filename local filename to save the resource file of the subject
-     * @param checksum filename to the location of the checksums
+     * @param detail filename to the location of the subject other information
      */
     public ChislevSubjectInformation( String name, String code, String dataUrl, String filename,
-                                      String solutionDbUrl, String checksum )
+                                      String solutionDbUrl, String detail )
     {
         mSubjectName = name;
         mSubjectCode = code;
         mSubjectDataUrl = dataUrl;
         mSubjectFilename = filename;
         mSubjectSolutionDBUrl = solutionDbUrl;
-        mSubjectDetailsCheckSums = checksum;
+        mSubjectDetailsFilename = detail;
     }
 
     public String getSubjectName() {
@@ -69,9 +70,11 @@ public class ChislevSubjectInformation
         }
     }
 
-    public String getSubjectDetailsCheckSums() {
-        return mSubjectDetailsCheckSums;
+    public String getSubjectDetailsFilename()
+    {
+        return mSubjectDetailsFilename;
     }
+
     public String getIconFilename()
     {
         return mIconFilename;
@@ -83,5 +86,15 @@ public class ChislevSubjectInformation
     public boolean isAllSet()
     {
         return mIsAllSet;
+    }
+
+    public void setCurrentSubjectChecksum( final String checksum )
+    {
+        mCurrentSubjectChecksum = checksum;
+    }
+
+    public String getCurrentSubjectChecksum()
+    {
+        return mCurrentSubjectChecksum;
     }
 }

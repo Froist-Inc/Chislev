@@ -1,6 +1,7 @@
 package com.froist_inc.josh.completeprogrammingquiz;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -32,6 +33,19 @@ class ChislevXMLSerializer
         xmlPullParser.setInput( new StringReader( data ) );
 
         return xmlPullParser;
+    }
+
+    private String GetDataFromDirectoryFilename( final String parentDirectory, final String filename )
+            throws IOException
+    {
+        ChislevFileManager fileManager = new ChislevFileManager( mContext );
+        if( !fileManager.FileExists( filename, parentDirectory ) ){
+            throw new IOException( "File does not exist." );
+        }
+        File parentDirectoryFile = new File( mContext.getFilesDir(), parentDirectory );
+        File file = new File( parentDirectoryFile.getCanonicalPath(), filename );
+
+        return fileManager.ReadDataFromFile( file.getCanonicalPath() );
     }
 
     public ArrayList<ChislevSubjectInformation> ParseConfigData( String data )
@@ -70,17 +84,10 @@ class ChislevXMLSerializer
         }
     }
 
-    public Map<String, ArrayList<ChislevQuestion>> ParseQuestions(final String parentDirectory, final String filename )
+    public Map<String, ArrayList<ChislevQuestion>> ParseQuestions( final String parentDirectory, final String filename )
             throws IOException, XmlPullParserException
     {
-        ChislevFileManager fileManager = new ChislevFileManager( mContext );
-        if( !fileManager.FileExists( filename, parentDirectory ) ){
-            throw new IOException( "File does not exist." );
-        }
-        File parentDirectoryFile = new File( mContext.getFilesDir(), parentDirectory );
-        File file = new File( parentDirectoryFile.getCanonicalPath(), filename );
-
-        String data = fileManager.ReadDataFromFile( file.getCanonicalPath() );
+        final String data = GetDataFromDirectoryFilename( parentDirectory, filename );
         XmlPullParser xmlPullParser = GetXMLParserForData( data );
         return ParseQuestionData( xmlPullParser );
     }
@@ -91,8 +98,7 @@ class ChislevXMLSerializer
         Map<String, ArrayList<ChislevQuestion>> questionMap = Collections.synchronizedMap( new HashMap<String,
                 ArrayList<ChislevQuestion>>());
 
-        final String element = "Element", question = "Question", explanation = "Explanation", hint = "Hint",
-                code = "Code", level = "Level", options = "Options";
+        final String element = "Element", question = "Question", code = "Code", level = "Level", options = "Options";
 
         int eventType = xmlPullParser.next();
         ChislevQuestion newQuestion = null;
@@ -109,10 +115,6 @@ class ChislevXMLSerializer
                     } else if( newQuestion != null ){
                         if( question.equals( name )){
                             newQuestion.setQuestion( xmlPullParser.nextText() );
-                        } else if( explanation.equals( name ) ){
-                            newQuestion.setExplanation( xmlPullParser.nextText() );
-                        } else if( hint.equals( name ) ){
-                            newQuestion.setHint( xmlPullParser.nextText() );
                         } else if( code.equals( name )){
 							eventType = xmlPullParser.nextToken();
 							while( eventType != XmlPullParser.END_DOCUMENT ){
@@ -155,5 +157,32 @@ class ChislevXMLSerializer
             eventType = xmlPullParser.next();
         }
         return questionMap;
+    }
+
+    public String GetSubjectDetailChecksum( String directory, String filename )
+    {
+        try {
+            final String data = GetDataFromDirectoryFilename( directory, filename );
+            final XmlPullParser xmlParserForData = GetXMLParserForData( data );
+            final String solEvent = "solution", updateMd5Value = "update_md5_value";
+            int event = xmlParserForData.next();
+
+            while ( event != XmlPullParser.END_DOCUMENT ) {
+                switch ( event ) {
+                    case XmlPullParser.START_TAG:
+                        final String tagName = xmlParserForData.getName();
+                        if ( tagName.equals( solEvent ) ) {
+                            return xmlParserForData.getAttributeValue( null, updateMd5Value );
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                event = xmlParserForData.next();
+            }
+        } catch( Exception exception ){
+            Log.d( "GetSubjectChecksum", exception.getLocalizedMessage() );
+        }
+        return null;
     }
 }
