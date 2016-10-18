@@ -25,6 +25,7 @@ public class ChislevScoresFragment extends Fragment {
     private ExpandableListView mExpandableListView;
     final Map<String, ArrayList<ChislevScoresFormat>> mScoreMap =
             Collections.synchronizedMap( new HashMap<String, ArrayList<ChislevScoresFormat>>() );
+    private View mOverlayView;
 
     @Nullable
     @Override
@@ -32,6 +33,8 @@ public class ChislevScoresFragment extends Fragment {
     {
         View view = inflater.inflate( R.layout.scores_fragment, container, false );
         mExpandableListView = ( ExpandableListView ) view.findViewById( R.id.expandableScoreListView );
+        mOverlayView = view.findViewById( R.id.scores_overlay );
+        mOverlayView.setVisibility( View.VISIBLE );
         getActivity().setTitle( R.string.scores );
         LoadConfigFile();
         return view;
@@ -127,6 +130,7 @@ public class ChislevScoresFragment extends Fragment {
                             header.add( mInformationList.get( i ).getSubjectCode() );
                         }
                         mExpandableListView.setAdapter( new ExpandableScoreAdapter( getActivity(), header, mScoreMap ));
+                        mOverlayView.setVisibility( View.INVISIBLE );
                     }
                 });
             }

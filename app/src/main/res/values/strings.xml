@@ -52,4 +52,6 @@
     <string name="question">Enter question here e.g. What is the output of the code below? </string>
     <string name="difficulty_level_text"> Difficulty( Beginner/Intermediate/Hard ) </string>
     <string name="input"> ( Optional ) Any specific output? What is it? </string>
+
+    <string name="premium">Premium options</string>
 </resources>

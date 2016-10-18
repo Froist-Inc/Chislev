@@ -1,26 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.DrawerLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_mainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/drawer_layout">
-
-    <FrameLayout
-        android:layout_marginTop="20dp"
-        android:id="@+id/drawer_mainLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-    <ListView
-        android:layout_marginTop="100dp"
-        android:id="@+id/drawer_listView"
-        android:layout_width="300dp"
-        android:layout_margin="10dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="1dp"
-        android:background="@android:color/white"/>
-
-</android.support.v4.widget.DrawerLayout>
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.froist_inc.josh.completeprogrammingquiz.IndexActivity"
+    tools:showIn="@layout/app_bar_main"/>
