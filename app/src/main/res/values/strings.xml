@@ -51,7 +51,11 @@
     <string name="hint_text">If the user wants an hint, what is to show?</string>
     <string name="question">Enter question here e.g. What is the output of the code below? </string>
     <string name="difficulty_level_text"> Difficulty( Beginner/Intermediate/Hard ) </string>
-    <string name="input"> ( Optional ) Any specific output? What is it? </string>
+    <string name="input"> Any specific output? What is it?( optional ) </string>
 
     <string name="premium">Premium options</string>
+    <string name="interview_special">Interview Special</string>
+    <string name="world_record">World Record</string>
+    <string name="weekly_tasks">Weekly tasks</string>
+    <string name="noScores">No scores recorded yet</string>
 </resources>

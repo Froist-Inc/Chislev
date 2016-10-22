@@ -23,13 +23,17 @@
     <item android:title="@string/premium">
         <menu>
             <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
+                android:id="@+id/nav_interviewSpecial"
+                android:icon="@android:drawable/sym_action_chat"
+                android:title="@string/interview_special" />
             <item
-                android:id="@+id/nav_send"
+                android:id="@+id/nav_weeklyTasks"
                 android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+                android:title="@string/weekly_tasks" />
+            <item
+                android:id="@+id/nav_worldRecord"
+                android:icon="@android:drawable/ic_menu_mapmode"
+                android:title="@string/world_record" />
         </menu>
     </item>
 

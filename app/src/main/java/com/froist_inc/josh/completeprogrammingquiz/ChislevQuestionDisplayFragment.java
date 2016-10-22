@@ -425,8 +425,11 @@ public class ChislevQuestionDisplayFragment extends Fragment
             if( isBasicFilter ){
                 questions = questionMap.get( filterCriteria );
             } else {
-                // TODO: 24-Sep-16
-                questions = questionMap.get( "Intermediate" );
+                questions = new ArrayList<>();
+                for ( final String key : questionMap.keySet() ){
+                    for( ChislevQuestion question: questionMap.get( key ) )
+                        questions.add( question );
+                }
             }
             if ( questions != null ){
                 Collections.shuffle( questions );
@@ -494,6 +497,8 @@ public class ChislevQuestionDisplayFragment extends Fragment
                             solutionsCursor.moveToNext();
                             solutionFormat = solutionsCursor.GetSolution();
                         }
+                        data.close();
+                        solutionsCursor.close();
                         ChislevQuestionDisplayActivity.SetAnswerList( solutions );
                     } else {
                         Log.d( TAG, "WTF is the solutions NULL?!" );
@@ -504,12 +509,10 @@ public class ChislevQuestionDisplayFragment extends Fragment
         }
 
         @Override
-        public void onLoaderReset( Loader loader ) {
-
-        }
+        public void onLoaderReset( Loader loader ) {}
     }
 
-    public static Fragment newInstance( int subjectIndex, int subjectLevel )
+    public static Fragment newInstance( final int subjectIndex, final int subjectLevel )
     {
         Bundle bundle = new Bundle();
         bundle.putInt( EXTRA_INDEX, subjectIndex );

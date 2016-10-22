@@ -20,7 +20,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChislevScoresFragment extends Fragment {
+public class ChislevScoresFragment extends Fragment
+{
     private ArrayList<ChislevSubjectInformation> mInformationList;
     private ExpandableListView mExpandableListView;
     final Map<String, ArrayList<ChislevScoresFormat>> mScoreMap =
@@ -36,6 +37,9 @@ public class ChislevScoresFragment extends Fragment {
         mOverlayView = view.findViewById( R.id.scores_overlay );
         mOverlayView.setVisibility( View.VISIBLE );
         getActivity().setTitle( R.string.scores );
+        TextView emptyView = new TextView( getActivity() );
+        emptyView.setText( R.string.noScores );
+        mExpandableListView.setEmptyView( emptyView );
         LoadConfigFile();
         return view;
     }
@@ -61,6 +65,8 @@ public class ChislevScoresFragment extends Fragment {
             for ( int i = 0; i != mInformationList.size(); ++i) {
                 getLoaderManager().initLoader( i, null, new ScoresLoaderCallback() );
             }
+        } else {
+            mOverlayView.setVisibility( View.INVISIBLE );
         }
     }
 
@@ -72,20 +78,23 @@ public class ChislevScoresFragment extends Fragment {
         };
 
         @Override
-        public Loader<Cursor> onCreateLoader( int id, Bundle args ) {
+        public Loader<Cursor> onCreateLoader( int id, Bundle args )
+        {
             final String dataId = mInformationList.get( id ).getSubjectCode();
             return new ChislevScoresDatabaseManager.ChislevScoresCursorLoader( getActivity(), tableColumns, dataId,
                     ChislevSubjectsLaboratory.Get( getActivity() ).GetSubjectItem( id ).getCurrentSubjectChecksum() );
         }
 
         @Override
-        public void onLoadFinished( final Loader<Cursor> loader, final Cursor data ) {
+        public void onLoadFinished( final Loader<Cursor> loader, final Cursor data )
+        {
             ResultStoringThread storingThread = new ResultStoringThread( loader, data );
             storingThread.start();
         }
 
         @Override
-        public void onLoaderReset( Loader<Cursor> loader ) {
+        public void onLoaderReset( Loader<Cursor> loader )
+        {
             if ( mExpandableListView != null ) {
                 // cast avoids ambiguous overload problem
                 mExpandableListView.setAdapter(( ExpandableListAdapter ) null);
@@ -116,11 +125,11 @@ public class ChislevScoresFragment extends Fragment {
                     mDataCursor.moveToNext();
                     score = mDataCursor.GetScore();
                 }
+                mDataCursor.close();
             }
             synchronized ( this ){
                 mScoreMap.put( mDataId, scores );
             }
-
             if( mScoreMap.size() == mInformationList.size() ){
                 getActivity().runOnUiThread( new Runnable() {
                     @Override
