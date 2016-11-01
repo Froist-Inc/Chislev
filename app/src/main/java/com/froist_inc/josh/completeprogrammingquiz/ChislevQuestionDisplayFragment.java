@@ -34,6 +34,9 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
@@ -68,6 +71,7 @@ public class ChislevQuestionDisplayFragment extends Fragment
     private CheckBox mUsingStringCheckbox;
     private RadioGroup mCollectiveOptions;
     private View view = null;
+    private AdView mPageTopAdView, mBottomAdView;
 
     Date mTimeStarted, mTimeCompleted;
 
@@ -96,7 +100,36 @@ public class ChislevQuestionDisplayFragment extends Fragment
         mAnswerText.setText( currentQuestion.getAnswer() != null ? currentQuestion.getAnswer() : "" );
         mUsingStringCheckbox.setChecked( false );
         mAnswerText.setVisibility( View.INVISIBLE );
+
+        mBottomAdView = ( AdView ) view.findViewById( R.id.footPageAdview );
+        mPageTopAdView = ( AdView ) view.findViewById( R.id.topPageAdview );
+        AdRequest bottomAdRequest = new AdRequest.Builder().build(), topPageAdRequest = new AdRequest.Builder().build();
+        mBottomAdView.loadAd( bottomAdRequest );
+        mPageTopAdView.loadAd( topPageAdRequest );
     }
+
+    @Override
+    public void onPause() {
+        if( mBottomAdView != null ){
+            mBottomAdView.pause();
+        }
+        if( mPageTopAdView != null ){
+            mPageTopAdView.pause();
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if( mBottomAdView != null ){
+            mBottomAdView.resume();
+        }
+        if( mPageTopAdView != null ){
+            mPageTopAdView.resume();
+        }
+    }
+
 
     @Nullable
     @Override

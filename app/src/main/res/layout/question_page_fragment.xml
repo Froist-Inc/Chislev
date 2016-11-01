@@ -17,8 +17,9 @@
             android:gravity="center"
             android:layout_height="wrap_content">
             <com.google.android.gms.ads.AdView
+                android:id="@+id/topPageAdview"
                 ads:adSize="BANNER"
-                ads:adUnitId="@string/footnote_banner_ad_unit"
+                ads:adUnitId="@string/topPage_ad_unit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
             </com.google.android.gms.ads.AdView>
@@ -106,6 +107,7 @@
                     android:visibility="invisible"
                     android:layout_gravity="center_horizontal" />
                 <com.google.android.gms.ads.AdView
+                    android:id="@+id/footPageAdview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     ads:adUnitId="@string/footnote_banner_ad_unit"
